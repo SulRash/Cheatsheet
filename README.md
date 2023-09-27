@@ -5,3 +5,5 @@ This is the repository for research involving adding frames of references to ima
 # Usage
 
 Just run the run.sh file.
+
+If you want to change any hyperparameters please look at the deepspeed config file in src/conf/ds_config.json.
