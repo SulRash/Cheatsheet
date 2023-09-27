@@ -2,13 +2,17 @@ import torch
 from torch.utils.data import random_split
 
 import torchvision.datasets as datasets
+import torchvision.transforms as transforms
 from torch.utils.data.dataloader import DataLoader
 
 from PIL import Image
 
 def get_cifar10(val_size: int = 5000):
-    cifar_trainset = datasets.CIFAR10(root='./data', train=True, download=True, transform=None)
-    cifar_testset = datasets.CIFAR10(root='./data', train=False, download=True, transform=None)
+    transform = transforms.Compose(
+        [transforms.ToTensor(),
+        transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+    cifar_trainset = datasets.CIFAR10(root='./data', train=True, download=True, transform=transform)
+    cifar_testset = datasets.CIFAR10(root='./data', train=False, download=True, transform=transform)
 
     torch.manual_seed(43)
     train_size = len(cifar_trainset) - val_size

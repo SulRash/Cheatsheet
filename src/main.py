@@ -1,13 +1,18 @@
 from models.cnn import CNN
 
-from utils.utils import set_random_seed
-from utils.arguments import get_args
-from utils.data import get_cifar10, get_dataloaders
+
 
 import torch
+import torch.nn as nn
 import deepspeed
 
 from deepspeed.ops.adam import DeepSpeedCPUAdam, FusedAdam
+
+
+from utils.utils import set_random_seed
+from utils.arguments import get_args
+from utils.data import get_cifar10, get_dataloaders
+from utils.loops import train_cifar, valid_cifar, test_cifar
 
 def main(args):
     if args.dataset == "cifar":
@@ -19,32 +24,33 @@ def main(args):
     else:
         torch.cuda.set_device(args.local_rank)
         device = torch.device("cuda", args.local_rank)
-        # Initializes the distributed backend which will take care of sychronizing nodes/GPUs
-        # torch.distributed.init_process_group(backend='nccl')
         deepspeed.init_distributed()
 
     args.global_rank = torch.distributed.get_rank()
-
     set_random_seed(args.seed)
-
     torch.distributed.barrier()
 
     model = CNN()
+    parameters = filter(lambda p: p.requires_grad, model.parameters())
 
-    model, optimizer, _, _ = deepspeed.initialize(args=args, model=model)
-
+    model, optimizer, _, _ = deepspeed.initialize(args=args, model=model, model_parameters=parameters)
     
+    if args.load_dir and args.ckpt_id:
+        model.load_checkpoint(args.load_dir, args.ckpt_id)
+
     for epoch in range(args.train_epochs):
+        
         model.train()
-        for step, batch in enumerate(train_dataloader):
-            loss = model(batch)
-            model.backward(loss)
-            model.step()
+        train_cifar(model, train_dataloader)
         
         model.eval()
-        for step, batch in enumerate(valid_dataloader):
-            loss = model(batch)
-            print("Validation loss: ", loss)
+        valid_cifar(model, valid_dataloader)
+
+        if epoch % args.test_interval:
+            test_cifar(model, test_dataloader)
+        
+        if epoch % args.save_interval:
+            model.save_checkpoint(args.save_dir, epoch)
 
 if __name__ == "__main__":
     args = get_args()
