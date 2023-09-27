@@ -33,6 +33,8 @@ def test_cifar(model, test_dataloader):
     with torch.no_grad():
         for data in test_dataloader:
             images, labels = data
+            images = images.to(model.device)
+            labels = labels.to(model.device)
             outputs = model(images)
             _, predicted = torch.max(outputs, 1)
             c = (predicted == labels).squeeze()

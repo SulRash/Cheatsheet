@@ -1,7 +1,5 @@
 from models.cnn import CNN
 
-
-
 import torch
 import torch.nn as nn
 import deepspeed
@@ -39,17 +37,16 @@ def main(args):
         model.load_checkpoint(args.load_dir, args.ckpt_id)
 
     for epoch in range(args.train_epochs):
-        
+
         model.train()
         train_cifar(model, train_dataloader)
-        
         model.eval()
         valid_cifar(model, valid_dataloader)
 
-        if epoch % args.test_interval:
+        if not epoch % args.test_interval:
             test_cifar(model, test_dataloader)
         
-        if epoch % args.save_interval:
+        if not epoch % args.save_interval:
             model.save_checkpoint(args.save_dir, epoch)
 
 if __name__ == "__main__":

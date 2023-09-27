@@ -1,5 +1,5 @@
 {
-    "train_batch_size": 32,
+    "train_batch_size": 16,
 
     "steps_per_print": 1000,
 
