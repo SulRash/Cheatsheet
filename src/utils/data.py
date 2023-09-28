@@ -8,9 +8,22 @@ from torch.utils.data.dataloader import DataLoader
 from PIL import Image
 
 def get_cifar10(val_size: int = 5000):
+
+    cifar_trainset = datasets.CIFAR10(root='./data', train=True, download=True)
+    
+    sheet = {}
+
+    for image, label in cifar_trainset:  
+        if label not in sheet:
+            sheet[label] = image
+    
+    del cifar_trainset
+
     transform = transforms.Compose(
-        [transforms.ToTensor(),
+        [transforms.Lambda(lambda x: add_sheet(x, sheet)),
+        transforms.ToTensor(),
         transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+    
     cifar_trainset = datasets.CIFAR10(root='./data', train=True, download=True, transform=transform)
     cifar_testset = datasets.CIFAR10(root='./data', train=False, download=True, transform=transform)
 
