@@ -10,7 +10,7 @@ from utils.loops import train_cifar, valid_cifar, test_cifar
 
 def main(args):
     if args.dataset == "cifar":
-        train_data, valid_data, test_data = get_cifar10(args.cheatsheet)
+        train_data, valid_data, test_data = get_cifar10(True)
 
     train_dataloader, valid_dataloader, test_dataloader = get_dataloaders(train_data, valid_data, test_data, args.batch_size)
     
@@ -41,7 +41,7 @@ def main(args):
             test_cifar(model, test_dataloader, epoch, args.exp_name)
         
         if not epoch % args.save_interval:
-            model.save_checkpoint(args.save_dir, epoch)
+            model.save_checkpoint(args.save_dir+args.exp_name+"/", epoch)
 
 if __name__ == "__main__":
     args = get_args()

@@ -54,5 +54,5 @@ def add_sheet(image, sheet):
     concated.paste(upscaled_image)
     for i in range(10):
         yaxis = 32*i
-        concated.paste(sheet[i].resize(16,16), (160,yaxis))
+        concated.paste(sheet[i].resize((16,16)), (160,yaxis))
     return concated
