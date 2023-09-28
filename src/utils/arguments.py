@@ -4,6 +4,7 @@ import deepspeed
 
 def get_args():
     parser = argparse.ArgumentParser()
+    parser.add_argument('--cheatsheet', type=bool, default=False)
     parser.add_argument('--dataset', type=str, default='cifar')
     parser.add_argument('--test_interval', type=int, default=5)
 
