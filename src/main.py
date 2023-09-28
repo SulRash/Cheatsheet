@@ -1,4 +1,4 @@
-from models.cnn import CNN
+from models.resnet import ResNet18
 
 import torch
 import torch.nn as nn
@@ -28,7 +28,7 @@ def main(args):
     set_random_seed(args.seed)
     torch.distributed.barrier()
 
-    model = CNN()
+    model = ResNet18(10)
     parameters = filter(lambda p: p.requires_grad, model.parameters())
 
     model, optimizer, _, _ = deepspeed.initialize(args=args, model=model, model_parameters=parameters)
