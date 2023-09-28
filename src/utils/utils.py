@@ -1,8 +1,9 @@
 import random
-import numpy as np
-import torch
-
+import os
 import json
+
+import torch
+import numpy as np
 
 def set_random_seed(seed):
     if seed is not None:
@@ -27,6 +28,10 @@ def append_json(new_data, path):
     except:
         file_data = []
         print("Generating new experiment file")
+        if not os.path.exists("results/"):
+            os.mkdir("results/")
+        
+
     with open(path, "w+") as file:
         file_data.append(new_data)
         file.seek(0)
