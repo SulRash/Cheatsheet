@@ -1,11 +1,7 @@
 from models.resnet import ResNet18
 
 import torch
-import torch.nn as nn
 import deepspeed
-
-from deepspeed.ops.adam import DeepSpeedCPUAdam, FusedAdam
-
 
 from utils.utils import set_random_seed
 from utils.arguments import get_args
@@ -14,14 +10,12 @@ from utils.loops import train_cifar, valid_cifar, test_cifar
 
 def main(args):
     if args.dataset == "cifar":
-        train_data, valid_data, test_data = get_cifar10()
+        train_data, valid_data, test_data = get_cifar10(False)
+
     train_dataloader, valid_dataloader, test_dataloader = get_dataloaders(train_data, valid_data, test_data, args.batch_size)
     
-    if args.local_rank == -1:
-        device = torch.device("cuda")
-    else:
+    if args.local_rank != -1:
         torch.cuda.set_device(args.local_rank)
-        device = torch.device("cuda", args.local_rank)
         deepspeed.init_distributed()
 
     args.global_rank = torch.distributed.get_rank()
@@ -44,7 +38,7 @@ def main(args):
         valid_cifar(model, valid_dataloader)
 
         if not epoch % args.test_interval:
-            test_cifar(model, test_dataloader)
+            test_cifar(model, test_dataloader, epoch)
         
         if not epoch % args.save_interval:
             model.save_checkpoint(args.save_dir, epoch)

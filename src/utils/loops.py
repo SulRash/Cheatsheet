@@ -1,6 +1,8 @@
 import torch
 import torch.nn as nn
 
+from utils.utils import append_json
+
 criterion = nn.CrossEntropyLoss()
 classes = ('plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse','ship', 'truck')
 
@@ -27,9 +29,13 @@ def valid_cifar(model, valid_dataloader):
     print("Validation loss: ", losses)
     print("="*25)
 
-def test_cifar(model, test_dataloader):
+def test_cifar(model, test_dataloader, epoch):
     class_correct = list(0. for i in range(10))
     class_total = list(0. for i in range(10))
+
+    accuracies = [0]*10
+    acc_per_class = {}
+
     with torch.no_grad():
         for data in test_dataloader:
             images, labels = data
@@ -44,5 +50,20 @@ def test_cifar(model, test_dataloader):
                 class_total[label] += 1
 
     for i in range(10):
+        accuracies[i] = 100 * class_correct[i] / class_total[i]
         print('Accuracy of %5s : %2d %%' %
-            (classes[i], 100 * class_correct[i] / class_total[i]))
+            (classes[i], accuracies[i]))
+        acc_per_class[classes[i]] = accuracies[i]
+    
+    total_acc = 100 * sum(class_correct)/sum(class_total)
+    print("Total accuracy: ", str(total_acc)+"%")
+
+
+    results = {
+        "Total Accuracy": total_acc,
+        "Accuracy Per Class": acc_per_class
+    }
+
+    append_json(results, "results/experiment.json")
+
+
