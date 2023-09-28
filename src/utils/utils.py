@@ -27,7 +27,7 @@ def append_json(new_data, path):
     except:
         file_data = []
         print("Generating new experiment file")
-    with open(path, "w") as file:
+    with open(path, "w+") as file:
         file_data.append(new_data)
         file.seek(0)
         json.dump(file_data, file, indent=4)
