@@ -7,7 +7,7 @@ from torch.utils.data.dataloader import DataLoader
 
 from PIL import Image
 
-def get_cifar10(cheatsheet: int = 0, val_size: int = 5000):
+def get_cifar10(cheatsheet: bool = False, val_size: int = 5000):
 
     if cheatsheet:
         cifar_trainset = datasets.CIFAR10(root='./data', train=True, download=True)
@@ -49,10 +49,11 @@ def get_dataloaders(train_data, valid_data, test_data, batch_size: int = 32):
     return train_dataloader, valid_dataloader, test_dataloader
 
 def add_sheet(image, sheet):
-    upscaled_image = image.resize((160,160))
-    concated = Image.new('RGB', (192,160))
+    
+    upscaled_image = image.resize((80,80))
+    concated = Image.new('RGB', (88,80))
     concated.paste(upscaled_image)
     for i in range(10):
         yaxis = 32*i
-        concated.paste(sheet[i].resize((16,16)), (160,yaxis))
+        concated.paste(sheet[i].resize((8,8)), (80,yaxis))
     return concated

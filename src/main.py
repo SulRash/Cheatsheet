@@ -1,7 +1,7 @@
-from models.resnet import ResNet18
-
 import torch
 import deepspeed
+
+from models.resnet import ResNet18
 
 from utils.utils import set_random_seed
 from utils.arguments import get_args

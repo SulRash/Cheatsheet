@@ -4,7 +4,8 @@ import deepspeed
 
 def get_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--cheatsheet', type=int, default=0)
+    parser.add_argument('--cheatsheet', action="store_true")
+    parser.add_argument('--cs_size', type=int, default=8)
     parser.add_argument('--dataset', type=str, default='cifar')
 
     parser.add_argument('--exp_name', type=str, default='Default')
