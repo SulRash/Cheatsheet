@@ -115,7 +115,7 @@ class ResNet(nn.Module):
         out = self.layer4(out)
         out = F.avg_pool2d(out, 4)
         y = out.view(out.size(0), -1)
-        #y = F.adaptive_max_pool1d(y, 512)
+        y = F.adaptive_max_pool1d(y, 512)
         out = self.linear(y)
         if out.requires_grad:
             out.register_hook(self.activations_hook)

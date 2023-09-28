@@ -49,10 +49,10 @@ def get_dataloaders(train_data, valid_data, test_data, batch_size: int = 32):
     return train_dataloader, valid_dataloader, test_dataloader
 
 def add_sheet(image, sheet):
-    upscaled_image = image.resize((288,320))
-    concated = Image.new('RGB', (320,320))
+    upscaled_image = image.resize((160,160))
+    concated = Image.new('RGB', (192,160))
     concated.paste(upscaled_image)
     for i in range(10):
         yaxis = 32*i
-        concated.paste(sheet[i], (288,yaxis))
+        concated.paste(sheet[i].resize(16,16), (160,yaxis))
     return concated
