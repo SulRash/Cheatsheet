@@ -7,7 +7,7 @@ from torch.utils.data.dataloader import DataLoader
 
 from PIL import Image
 
-def get_cifar10(cheatsheet: bool = False, val_size: int = 5000):
+def get_cifar10(cheatsheet: int = 0, val_size: int = 5000):
 
     if cheatsheet:
         cifar_trainset = datasets.CIFAR10(root='./data', train=True, download=True)

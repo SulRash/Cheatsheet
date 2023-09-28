@@ -29,7 +29,7 @@ def valid_cifar(model, valid_dataloader):
     print("Validation loss: ", losses)
     print("="*25)
 
-def test_cifar(model, test_dataloader, epoch):
+def test_cifar(model, test_dataloader, epoch, exp_name):
     class_correct = list(0. for i in range(10))
     class_total = list(0. for i in range(10))
 
@@ -60,10 +60,11 @@ def test_cifar(model, test_dataloader, epoch):
 
 
     results = {
+        "Epoch": epoch,
         "Total Accuracy": total_acc,
         "Accuracy Per Class": acc_per_class
     }
 
-    append_json(results, "results/experiment.json")
+    append_json(results, f"results/{exp_name}.json")
 
 

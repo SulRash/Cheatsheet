@@ -21,8 +21,13 @@ def to_device(batch, device):
     return output
 
 def append_json(new_data, path):
-    with open(path, "r") as file:
-        file_data = json.load(file)
+    try:
+        with open(path, "r") as file:
+            file_data = json.load(file)
+    except:
+        file_data = []
+        print("Generating new experiment file")
+    with open(path, "w") as file:
         file_data.append(new_data)
         file.seek(0)
         json.dump(file_data, file, indent=4)
