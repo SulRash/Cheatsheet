@@ -1,6 +1,6 @@
-BATCH_SIZE=32
+BATCH_SIZE=128
 DATASET="cifar"
 CHEATSHEET=0
-EXP_NAME="CheatsheetResnet18-88x80-Batch32"
+EXP_NAME="NoCheatsheetResnet18-176x160-Batch128pergpu"
 
-deepspeed --num_gpus 0 src/main.py --dataset ${DATASET} --exp_name ${EXP_NAME} --batch_size ${BATCH_SIZE} --deepspeed_config "src/conf/ds_config.json" --cheatsheet --cs_size 8
+deepspeed --num_gpus 8 src/main.py --dataset ${DATASET} --exp_name ${EXP_NAME} --batch_size ${BATCH_SIZE} --deepspeed_config "src/conf/ds_config.json" --cs_size 16

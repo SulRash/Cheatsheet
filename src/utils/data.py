@@ -7,28 +7,24 @@ from torch.utils.data.dataloader import DataLoader
 
 from PIL import Image
 
-def get_cifar10(cheatsheet: bool = False, val_size: int = 5000):
+from typing import Dict
 
-    if cheatsheet:
-        cifar_trainset = datasets.CIFAR10(root='./data', train=True, download=True)
-        
-        sheet = {}
+def get_cifar10(cheatsheet: bool = False, cs_size: int = 8, val_size: int = 2500):
 
-        for image, label in cifar_trainset:  
-            if label not in sheet:
-                sheet[label] = image
-        
-        del cifar_trainset
-
-        transform = transforms.Compose(
-            [transforms.Lambda(lambda x: add_sheet(x, sheet)),
-            transforms.ToTensor(),
-            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+    cifar_trainset = datasets.CIFAR10(root='./data', train=True, download=True)
     
-    else:
-        transform = transforms.Compose(
-            [transforms.ToTensor(),
-            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+    sheet = {}
+
+    for image, label in cifar_trainset:  
+        if label not in sheet:
+            sheet[label] = image
+    
+    del cifar_trainset
+
+    transform = transforms.Compose(
+        [transforms.Lambda(lambda x: modify_image(x, sheet, cheatsheet, cs_size)),
+        transforms.ToTensor(),
+        transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
     
     cifar_trainset = datasets.CIFAR10(root='./data', train=True, download=True, transform=transform)
     cifar_testset = datasets.CIFAR10(root='./data', train=False, download=True, transform=transform)
@@ -48,12 +44,15 @@ def get_dataloaders(train_data, valid_data, test_data, batch_size: int = 32):
 
     return train_dataloader, valid_dataloader, test_dataloader
 
-def add_sheet(image, sheet):
+def modify_image(image: Image, sheet: Dict, cheatsheet: bool = False, cs_size: int = 8) -> Image:
+    new_image_box = cs_size * 10
+    new_image_width = cs_size * 11
     
-    upscaled_image = image.resize((80,80))
-    concated = Image.new('RGB', (88,80))
-    concated.paste(upscaled_image)
-    for i in range(10):
-        yaxis = 32*i
-        concated.paste(sheet[i].resize((8,8)), (80,yaxis))
-    return concated
+    upscaled_image = image.resize((new_image_box, new_image_box))
+    modified = Image.new('RGB', (new_image_width, new_image_box))
+    modified.paste(upscaled_image)
+    if cheatsheet:
+        for i in range(10):
+            y_start = 32*i
+            modified.paste(sheet[i].resize((cs_size, cs_size)), (new_image_box, y_start))
+    return modified

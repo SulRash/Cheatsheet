@@ -10,7 +10,7 @@ from utils.loops import train_cifar, valid_cifar, test_cifar
 
 def main(args):
     if args.dataset == "cifar":
-        train_data, valid_data, test_data = get_cifar10(True)
+        train_data, valid_data, test_data = get_cifar10(args.cheatsheet, args.cs_size)
 
     train_dataloader, valid_dataloader, test_dataloader = get_dataloaders(train_data, valid_data, test_data, args.batch_size)
     
