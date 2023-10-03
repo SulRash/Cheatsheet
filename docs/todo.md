@@ -35,3 +35,7 @@ We should try and train with a subset of imagenet instead of CIFAR for more real
 ## Backpropogate to Input
 
 We should investigate backpropogating the loss all the way to the input and draw heatmaps on the original image to see if changing the reference image's pixels would have affected model performance. This would show that the model is utilizing the reference image.
+
+# Bugs
+
+## Make Directory for Example Image if it Does Not Exist

@@ -5,3 +5,4 @@ src/utils/__pycache__/
 src/models/__pycache__/
 results/
 examples/
+src/conf/ds_config.json
