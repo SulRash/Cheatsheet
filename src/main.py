@@ -1,6 +1,8 @@
 import torch
 import deepspeed
 
+import torch.distributed as dist
+
 from models.resnet import ResNet18
 
 from utils.utils import set_random_seed
@@ -34,14 +36,17 @@ def main(args):
 
         model.train()
         train_cifar(model, train_dataloader)
-        model.eval()
-        valid_cifar(model, valid_dataloader)
-
-        if not epoch % args.test_interval:
-            test_cifar(model, test_dataloader, epoch, args.exp_name)
+        dist.barrier()
         
-        if not epoch % args.save_interval:
-            model.save_checkpoint(args.save_dir+args.exp_name+"/", epoch)
+        if dist.get_rank() == 0:
+            model.eval()
+            valid_cifar(model, valid_dataloader)
+
+            if not epoch % args.test_interval:
+                test_cifar(model, test_dataloader, epoch, args.exp_name)
+            
+            if not epoch % args.save_interval:
+                model.save_checkpoint(args.save_dir+args.exp_name+"/", epoch)
 
 if __name__ == "__main__":
     args = get_args()
