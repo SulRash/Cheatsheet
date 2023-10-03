@@ -28,6 +28,7 @@ def valid_cifar(model, valid_dataloader):
     print("="*25)
     print("Validation loss: ", losses)
     print("="*25)
+    return losses
 
 def test_cifar(model, test_dataloader, epoch, exp_name):
     class_correct = list(0. for i in range(10))
