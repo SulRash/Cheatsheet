@@ -56,15 +56,16 @@ def modify_image(image: Image, sheet: Dict, cheatsheet: bool = False, cs_size: i
     new_image_box = cs_size * 10
     new_image_width = cs_size * 11
     
-    upscaled_image = image.resize((new_image_box, new_image_box))
-    modified = Image.new('RGB', (new_image_width, new_image_box))
-    modified.paste(upscaled_image)
-    
     # Adds a single column for the cheatsheet
     if cheatsheet:
+        upscaled_image = image.resize((new_image_box, new_image_box))
+        modified = Image.new('RGB', (new_image_width, new_image_box))
+        modified.paste(upscaled_image)
         for i in range(10):
             y_start = cs_size*i
             modified.paste(sheet[i].resize((cs_size, cs_size)), (new_image_box, y_start))
+    else:
+        modified = image.resize((new_image_box, new_image_box))
     
     # Saves an example of the image
     example_image_path = "examples/"+experiment_name+".jpg"
