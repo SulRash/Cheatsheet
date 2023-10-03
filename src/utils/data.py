@@ -63,7 +63,7 @@ def modify_image(image: Image, sheet: Dict, cheatsheet: bool = False, cs_size: i
     # Adds a single column for the cheatsheet
     if cheatsheet:
         for i in range(10):
-            y_start = 32*i
+            y_start = cs_size*i
             modified.paste(sheet[i].resize((cs_size, cs_size)), (new_image_box, y_start))
     
     # Saves an example of the image
