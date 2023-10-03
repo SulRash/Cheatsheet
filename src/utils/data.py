@@ -1,3 +1,5 @@
+import os.path
+
 import torch
 
 from torch.utils.data import random_split
@@ -7,13 +9,11 @@ from torch.utils.data.distributed import DistributedSampler
 import torchvision.datasets as datasets
 import torchvision.transforms as transforms
 
-
-
 from PIL import Image
 
 from typing import Dict
 
-def get_cifar10(cheatsheet: bool = False, cs_size: int = 8, val_size: int = 2500):
+def get_cifar10(cheatsheet: bool = False, cs_size: int = 8, experiment_name: str = "Default", val_size: int = 2500):
 
     cifar_trainset = datasets.CIFAR10(root='./data', train=True, download=True)
     
@@ -26,7 +26,7 @@ def get_cifar10(cheatsheet: bool = False, cs_size: int = 8, val_size: int = 2500
     del cifar_trainset
 
     transform = transforms.Compose(
-        [transforms.Lambda(lambda x: modify_image(x, sheet, cheatsheet, cs_size)),
+        [transforms.Lambda(lambda x: modify_image(x, sheet, cheatsheet, cs_size, experiment_name)),
         transforms.ToTensor(),
         transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
     
@@ -52,15 +52,22 @@ def get_dataloaders(train_data, valid_data, test_data, batch_size: int = 32):
 
     return train_dataloader, valid_dataloader, test_dataloader
 
-def modify_image(image: Image, sheet: Dict, cheatsheet: bool = False, cs_size: int = 8) -> Image:
+def modify_image(image: Image, sheet: Dict, cheatsheet: bool = False, cs_size: int = 8, experiment_name: str = "Default") -> Image:
     new_image_box = cs_size * 10
     new_image_width = cs_size * 11
     
     upscaled_image = image.resize((new_image_box, new_image_box))
     modified = Image.new('RGB', (new_image_width, new_image_box))
     modified.paste(upscaled_image)
+    
+    # Adds a single column for the cheatsheet
     if cheatsheet:
         for i in range(10):
             y_start = 32*i
             modified.paste(sheet[i].resize((cs_size, cs_size)), (new_image_box, y_start))
+    
+    # Saves an example of the image
+    example_image_path = "examples/"+experiment_name+".jpg"
+    if not os.path.isfile(example_image_path):
+        modified.save(example_image_path)
     return modified
