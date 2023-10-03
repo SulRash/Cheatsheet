@@ -12,13 +12,14 @@ from utils.loops import train_cifar, valid_cifar, test_cifar
 
 def main(args):
     if args.dataset == "cifar":
-        train_data, valid_data, test_data = get_cifar10(args.cheatsheet, args.cs_size)
+        train_data, valid_data, test_data = get_cifar10(args.cheatsheet, args.cs_size, args.exp_name)
     
     if args.local_rank != -1:
         torch.cuda.set_device(args.local_rank)
         deepspeed.init_distributed()
 
-    
+    old_loss = 99999
+
     train_dataloader, valid_dataloader, test_dataloader = get_dataloaders(train_data, valid_data, test_data, args.batch_size)
 
     set_random_seed(args.seed)
@@ -39,7 +40,12 @@ def main(args):
         
         if dist.get_rank() == 0:
             model.eval()
-            valid_cifar(model, valid_dataloader)
+            new_loss = valid_cifar(model, valid_dataloader)
+
+            # Prevent overfitting
+            if new_loss > old_loss:
+                break
+            new_loss = old_loss
 
             if not epoch % args.test_interval:
                 test_cifar(model, test_dataloader, epoch, args.exp_name)
