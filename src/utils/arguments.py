@@ -6,7 +6,9 @@ def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--cheatsheet', action="store_true")
     parser.add_argument('--cs_size', type=int, default=8)
-    parser.add_argument('--dataset', type=str, default='cifar')
+    parser.add_argument('--dataset', type=str, choices=['cifar'], default='cifar')
+
+    parser.add_argument('--model', type=str, choices=['resnet18', 'resnet32', 'flexivit_base', 'vit_base_patch8_224'])
 
     parser.add_argument('--exp_name', type=str, default='Default')
     parser.add_argument('--test_interval', type=int, default=5)

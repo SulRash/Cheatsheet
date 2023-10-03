@@ -3,7 +3,7 @@ import deepspeed
 
 import torch.distributed as dist
 
-from models.resnet import ResNet18
+from models import get_model
 
 from utils.utils import set_random_seed
 from utils.arguments import get_args
@@ -25,7 +25,8 @@ def main(args):
     set_random_seed(args.seed)
     dist.barrier()
 
-    model = ResNet18(10)
+    model = get_model(args.model, 10, args.cs_size)
+
     parameters = filter(lambda p: p.requires_grad, model.parameters())
 
     model, optimizer, _, _ = deepspeed.initialize(args=args, model=model, model_parameters=parameters)
