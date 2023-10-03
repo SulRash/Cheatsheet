@@ -1,9 +1,13 @@
 import torch
+
 from torch.utils.data import random_split
+from torch.utils.data.dataloader import DataLoader, SequentialSampler
+from torch.utils.data.distributed import DistributedSampler
 
 import torchvision.datasets as datasets
 import torchvision.transforms as transforms
-from torch.utils.data.dataloader import DataLoader
+
+
 
 from PIL import Image
 
@@ -38,9 +42,13 @@ def get_cifar10(cheatsheet: bool = False, cs_size: int = 8, val_size: int = 2500
 
 def get_dataloaders(train_data, valid_data, test_data, batch_size: int = 32):
 
-    train_dataloader = DataLoader(train_data, batch_size, shuffle=True, num_workers=4, pin_memory=True)
-    valid_dataloader = DataLoader(valid_data, batch_size, num_workers=4, pin_memory=True)
-    test_dataloader = DataLoader(test_data, batch_size, shuffle=True, num_workers=4, pin_memory=True)
+    train_sampler = DistributedSampler(train_data)
+    valid_sampler = SequentialSampler(valid_data)
+    test_sampler = SequentialSampler(test_data)
+
+    train_dataloader = DataLoader(train_data, batch_size, num_workers=4, pin_memory=True, sampler=train_sampler)
+    valid_dataloader = DataLoader(valid_data, batch_size, num_workers=4, pin_memory=True, sampler=valid_sampler)
+    test_dataloader = DataLoader(test_data, batch_size, num_workers=4, pin_memory=True, sampler=test_sampler)
 
     return train_dataloader, valid_dataloader, test_dataloader
 

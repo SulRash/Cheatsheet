@@ -12,7 +12,7 @@ def get_args():
     parser.add_argument('--test_interval', type=int, default=5)
 
     parser.add_argument('--batch_size', type=int, default=16)
-    parser.add_argument('--train_epochs', type=int, default=1000)
+    parser.add_argument('--train_epochs', type=int, default=250)
     
     parser.add_argument('--save_dir', type=str, default="checkpoints/")
     parser.add_argument('--load_dir', type=str, default=None)
