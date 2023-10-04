@@ -24,9 +24,13 @@ We should try shuffling the cheat sheet and changing the label of the image to t
 
 Masking the reference image corresponding to the label randomly during training might introduce some interesting results.
 
-# Datasets
+# Data
 
-## Imagenet
+## Try Loading Cheatsheet at the Top Instead of Bottom
+
+## Datasets
+
+### Imagenet
 
 We should try and train with a subset of imagenet instead of CIFAR for more realistic performance.
 
