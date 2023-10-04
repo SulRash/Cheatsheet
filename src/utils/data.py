@@ -29,6 +29,7 @@ def get_cifar10(cheatsheet: bool = False, cs_size: int = 8, experiment_name: str
         [transforms.Lambda(lambda x: modify_image(x, sheet, cheatsheet, cs_size, experiment_name)),
         transforms.ToTensor(),
         transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+        
     
     cifar_trainset = datasets.CIFAR10(root='./data', train=True, download=True, transform=transform)
     cifar_testset = datasets.CIFAR10(root='./data', train=False, download=True, transform=transform)

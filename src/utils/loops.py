@@ -1,6 +1,8 @@
 import torch
 import torch.nn as nn
 
+import torchvision
+from torchvision.utils import save_image
 from utils.utils import append_json
 
 criterion = nn.CrossEntropyLoss()
@@ -68,4 +70,29 @@ def test_cifar(model, test_dataloader, epoch, exp_name):
 
     append_json(results, f"results/{exp_name}.json")
 
+
+def compute_saliency_maps(model, inputs, targets):
+    model.eval()
+    inputs.requires_grad_()
+
+    outputs = model(inputs)
+    loss = criterion(outputs, targets)
+    loss.backward()
+
+    saliencies = inputs.grad.data.abs()
+    saliencies, _ = torch.max(saliencies, dim=1)
+    return saliencies
+
+def denormalize(tensor, mean=[0.4914, 0.4822, 0.4465], std=[0.2023, 0.1994, 0.2010]):
+    for t, m, s in zip(tensor, mean, std):
+        t.mul_(s).add_(m)
+    return tensor
+
+def visualize_and_save_saliency(images, saliencies, epoch, exp_name, directory='./saliency_maps/'):
+    for idx, (img, sal) in enumerate(zip(images, saliencies)):
+        denorm_img = denormalize(img.clone().detach())
+        torchvision.utils.save_image(denorm_img, f"./saliency_maps2/original/epoch{epoch}_image{idx}.png")
+        # Save saliency map
+        sal_normalized = (sal - sal.min()) / (sal.max() - sal.min())
+        torchvision.utils.save_image(sal_normalized.unsqueeze(0), f"./saliency_maps2/saliency/epoch{epoch}_saliency{idx}.png")   
 

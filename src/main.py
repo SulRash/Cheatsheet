@@ -8,7 +8,8 @@ from models import get_model
 from utils.utils import set_random_seed
 from utils.arguments import get_args
 from utils.data import get_cifar10, get_dataloaders
-from utils.loops import train_cifar, valid_cifar, test_cifar
+from utils.loops import *
+
 
 def main(args):
     if args.dataset == "cifar":
@@ -42,6 +43,12 @@ def main(args):
         if dist.get_rank() == 0:
             model.eval()
             new_loss = valid_cifar(model, valid_dataloader)
+
+
+            images, labels = next(iter(valid_dataloader))
+            images, labels = images.cuda(), labels.cuda()
+            saliencies = compute_saliency_maps(model, images, labels)
+            visualize_and_save_saliency(images, saliencies, epoch, args.exp_name)
 
             # Prevent overfitting
             if new_loss > old_loss:
