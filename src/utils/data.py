@@ -79,9 +79,9 @@ def get_pets(cheatsheet: bool = False, cs_size: int = 8, experiment_name: str = 
 
 
     torch.manual_seed(43)
-    train_size = len(oxfordpet_trainset) - val_size - val_size
+    train_size = len(oxfordpet_trainset) - val_size
 
-    oxfordpet_trainset, oxfordpet_validset, oxfordpet_testset = random_split(oxfordpet_trainset, [train_size, val_size, val_size])
+    oxfordpet_trainset, oxfordpet_validset = random_split(oxfordpet_trainset, [train_size, val_size])
 
     return oxfordpet_trainset, oxfordpet_validset, oxfordpet_testset, num_classes
 

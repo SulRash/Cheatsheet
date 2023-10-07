@@ -96,8 +96,8 @@ def denormalize(tensor, mean=[0.4914, 0.4822, 0.4465], std=[0.2023, 0.1994, 0.20
 def visualize_and_save_saliency(images, saliencies, epoch, exp_name, directory='./saliency_maps/'):
     for idx, (img, sal) in enumerate(zip(images, saliencies)):
         denorm_img = denormalize(img.clone().detach())
-        torchvision.utils.save_image(denorm_img, f"./saliency_maps2/original/epoch{epoch}_image{idx}.png")
+        torchvision.utils.save_image(denorm_img, f"./saliency_maps/original/epoch{epoch}_image{idx}.png")
         # Save saliency map
         sal_normalized = (sal - sal.min()) / (sal.max() - sal.min())
-        torchvision.utils.save_image(sal_normalized.unsqueeze(0), f"./saliency_maps2/saliency/epoch{epoch}_saliency{idx}.png")   
+        torchvision.utils.save_image(sal_normalized.unsqueeze(0), f"./saliency_maps/saliency/epoch{epoch}_saliency{idx}.png")   
 

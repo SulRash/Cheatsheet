@@ -45,8 +45,8 @@ def main(args):
             model.eval()
             new_loss = validation(model, valid_dataloader)
 
-            one_each = {}
             images, labels = next(iter(valid_dataloader))
+            images, labels = images.cuda(), labels.cuda()
             
             saliencies = compute_saliency_maps(model, images, labels)
             visualize_and_save_saliency(images, saliencies, epoch, args.exp_name)
@@ -57,10 +57,7 @@ def main(args):
             new_loss = old_loss
 
             if not epoch % args.test_interval:
-                if args.dataset == "cifar":
-                    test(model, test_dataloader, epoch, args.exp_name)
-                elif args.dataset == "pets":
-                    test_pets(model, test_dataloader)
+                    test(model, test_dataloader, epoch, args.exp_name, args.dataset)
         
         dist.barrier()
 
