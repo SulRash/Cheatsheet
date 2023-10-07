@@ -39,11 +39,11 @@ def main(args):
     for epoch in range(args.train_epochs):
 
         model.train()
-        train_cifar(model, train_dataloader)
+        train(model, train_dataloader)
         
         if dist.get_rank() == 0:
             model.eval()
-            new_loss = valid_cifar(model, valid_dataloader)
+            new_loss = validation(model, valid_dataloader)
 
             one_each = {}
             images, labels = next(iter(valid_dataloader))
@@ -57,7 +57,10 @@ def main(args):
             new_loss = old_loss
 
             if not epoch % args.test_interval:
-                test_cifar(model, test_dataloader, epoch, args.exp_name)
+                if args.dataset == "cifar":
+                    test(model, test_dataloader, epoch, args.exp_name)
+                elif args.dataset == "pets":
+                    test_pets(model, test_dataloader)
         
         dist.barrier()
 

@@ -6,9 +6,8 @@ from torchvision.utils import save_image
 from utils.utils import append_json
 
 criterion = nn.CrossEntropyLoss()
-classes = ('plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse','ship', 'truck')
 
-def train_cifar(model, train_dataloader):
+def train(model, train_dataloader):
     for step, batch in enumerate(train_dataloader):
         inputs = batch[0].to(model.device)
         labels = batch[1].to(model.device)
@@ -17,7 +16,7 @@ def train_cifar(model, train_dataloader):
         model.backward(loss)
         model.step()
 
-def valid_cifar(model, valid_dataloader):
+def validation(model, valid_dataloader):
     losses = 0
     for step, batch in enumerate(valid_dataloader):
         inputs = batch[0].to(model.device)
@@ -32,11 +31,17 @@ def valid_cifar(model, valid_dataloader):
     print("="*25)
     return losses
 
-def test_cifar(model, test_dataloader, epoch, exp_name):
-    class_correct = list(0. for i in range(10))
-    class_total = list(0. for i in range(10))
+def test(model, test_dataloader, epoch, exp_name, dataset_name: str):
+    
+    if dataset_name == "cifar":
+        classes  = ['plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse','ship', 'truck']
+    elif dataset_name == "pets":
+        classes = [str(i) for i in range(37)]
+    
+    class_correct = list(0. for i in range(len(classes)))
+    class_total = list(0. for i in range(len(classes)))
 
-    accuracies = [0]*10
+    accuracies = [0]*len(classes)
     acc_per_class = {}
 
     with torch.no_grad():
@@ -52,7 +57,7 @@ def test_cifar(model, test_dataloader, epoch, exp_name):
                 class_correct[label] += c[i].item()
                 class_total[label] += 1
 
-    for i in range(10):
+    for i in range(len(classes)):
         accuracies[i] = 100 * class_correct[i] / class_total[i]
         print('Accuracy of %5s : %2d %%' %
             (classes[i], accuracies[i]))
