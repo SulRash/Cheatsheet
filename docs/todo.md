@@ -10,6 +10,10 @@ We should train with just the resized image without the appended images to the s
 
 We should crop the original image randomly and assign it to different parts of the cheat sheet to introduce noise that isn't too far off from the original image.
 
+# Modelling
+
+## Add Special Token for Cheatsheet
+
 # Unsupervised Learning
 
 Train the model so that it doesn't use labelling and instead labels through comparing the embeddings of the main image and bounding boxes on the cheat sheet.
