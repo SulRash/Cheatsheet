@@ -2,6 +2,6 @@ src/data/
 data/
 src/utils/__pycache__/
 src/models/__pycache__/
-src/experiments
+experiments/
 src/conf/ds_config.json
 run.sh
