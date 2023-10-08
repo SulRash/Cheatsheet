@@ -5,7 +5,7 @@ import torch.distributed as dist
 
 from models import get_model
 
-from utils.utils import set_random_seed, make_directories
+from utils.utils import set_random_seed, setup_experiment
 from utils.arguments import get_args
 from utils.data import get_pets, get_cifar10, get_dataloaders
 from utils.loops import *
@@ -70,5 +70,5 @@ def main(args):
 
 if __name__ == "__main__":
     args = get_args()
-    make_directories(args.exp_name)
+    setup_experiment(args)
     main(args)

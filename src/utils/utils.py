@@ -5,12 +5,14 @@ import json
 import torch
 import numpy as np
 
-def make_directories(exp_name: str):
-
-    subfolders = ['results/', 'saliency_maps/original/', 'saliency_maps/saliency/']
+def setup_experiment(args):
+    subfolders = ['saliency_maps/original/', 'saliency_maps/saliency/']
 
     for subfolder in subfolders:
-        os.makedirs(os.path.join(f"experiments/{exp_name}/", subfolder), exist_ok=True)
+        os.makedirs(os.path.join(f"experiments/{args.exp_name}/", subfolder), exist_ok=True)
+
+    with open(f"experiments/{args.exp_name}/hparams.json", "w") as file:
+        json.dump(vars(args), file, indent=4)
 
 def set_random_seed(seed: int):
     if seed is not None:

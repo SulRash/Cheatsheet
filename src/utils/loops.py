@@ -52,7 +52,7 @@ def test(model, test_dataloader, epoch, exp_name, dataset_name: str):
             outputs = model(images)
             _, predicted = torch.max(outputs, 1)
             c = (predicted == labels).squeeze()
-            for i in range(4):
+            for i in range(len(classes)):
                 label = labels[i]
                 class_correct[label] += c[i].item()
                 class_total[label] += 1

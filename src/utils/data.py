@@ -61,11 +61,7 @@ def modify_image(image: Image, sheet: Dict, cheatsheet: bool = False, cs_size: i
                            
     else:
         modified = image.resize((new_image_box, new_image_height))
-            
-    # Saves an example of the image
-    example_image_path = f"experiments/{exp_name}/example_image.jpg"
-    if not os.path.isfile(example_image_path):
-        modified.save(example_image_path)
+
     return modified
 
 def get_pets(cheatsheet: bool = False, cs_size: int = 8, exp_name: str = "Default", val_size: int = 2500):
@@ -123,8 +119,8 @@ def get_dataloaders(train_data, valid_data, test_data, batch_size: int = 32):
     valid_sampler = SequentialSampler(valid_data)
     test_sampler = SequentialSampler(test_data)
 
-    train_dataloader = DataLoader(train_data, batch_size, num_workers=4, pin_memory=True, sampler=train_sampler)
-    valid_dataloader = DataLoader(valid_data, batch_size, num_workers=4, pin_memory=True, sampler=valid_sampler)
-    test_dataloader = DataLoader(test_data, batch_size, num_workers=4, pin_memory=True, sampler=test_sampler)
+    train_dataloader = DataLoader(train_data, batch_size, num_workers=16, pin_memory=False, sampler=train_sampler)
+    valid_dataloader = DataLoader(valid_data, batch_size, num_workers=16, pin_memory=False, sampler=valid_sampler)
+    test_dataloader = DataLoader(test_data, batch_size, num_workers=16, pin_memory=False, sampler=test_sampler)
 
     return train_dataloader, valid_dataloader, test_dataloader
