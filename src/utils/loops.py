@@ -1,3 +1,5 @@
+import os
+
 import torch
 import torch.nn as nn
 
@@ -37,6 +39,8 @@ def test(model, test_dataloader, epoch, exp_name, dataset_name: str):
         classes  = ['plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse','ship', 'truck']
     elif dataset_name == "pets":
         classes = [str(i) for i in range(37)]
+    elif dataset_name == "cifar100":
+        classes = [str(i) for i in range(100)]
     
     class_correct = list(0. for i in range(len(classes)))
     class_total = list(0. for i in range(len(classes)))
@@ -52,7 +56,7 @@ def test(model, test_dataloader, epoch, exp_name, dataset_name: str):
             outputs = model(images)
             _, predicted = torch.max(outputs, 1)
             c = (predicted == labels).squeeze()
-            for i in range(len(classes)):
+            for i in range(16):
                 label = labels[i]
                 class_correct[label] += c[i].item()
                 class_total[label] += 1
@@ -95,15 +99,22 @@ def denormalize(tensor, mean=[0.4914, 0.4822, 0.4465], std=[0.2023, 0.1994, 0.20
         t.mul_(s).add_(m)
     return tensor
 
-def visualize_and_save_saliency(images, labels, saliencies, epoch, exp_name):
+def visualize_and_save_saliency(images, labels, saliencies, epoch, exp_name):    
+    
+    directory = f"./experiments/{exp_name}/saliency_maps"
+    original_dir = f"{directory}/originals/"
+    saliency_dir = f"{directory}/saliency/epoch{epoch}/"
+    os.makedirs(saliency_dir, exist_ok=True)
+    
     one_each = {}
+
     for _, (img, sal, lab) in enumerate(zip(images, saliencies, labels)):
         if lab not in one_each.keys():
             denorm_img = denormalize(img.clone().detach())
-            torchvision.utils.save_image(denorm_img, f"./experiments/{exp_name}/saliency_maps/original/epoch{epoch}_image{lab}.png")
+            torchvision.utils.save_image(denorm_img, f"{original_dir}image{lab}.png")
             
             # Save saliency map
             sal_normalized = (sal - sal.min()) / (sal.max() - sal.min())
-            torchvision.utils.save_image(sal_normalized.unsqueeze(0), f"./experiments/{exp_name}/saliency_maps/saliency/epoch{epoch}_saliency{lab}.png")
+            torchvision.utils.save_image(sal_normalized.unsqueeze(0), f"{saliency_dir}epoch{epoch}_saliency{lab}.png")
 
             one_each[lab] = (img, sal)

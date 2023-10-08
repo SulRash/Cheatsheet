@@ -6,7 +6,7 @@ import torch
 import numpy as np
 
 def setup_experiment(args):
-    subfolders = ['saliency_maps/original/', 'saliency_maps/saliency/']
+    subfolders = ['saliency_maps/originals/', 'saliency_maps/saliency/']
 
     for subfolder in subfolders:
         os.makedirs(os.path.join(f"experiments/{args.exp_name}/", subfolder), exist_ok=True)

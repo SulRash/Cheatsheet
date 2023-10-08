@@ -112,6 +112,30 @@ def get_cifar10(cheatsheet: bool = False, cs_size: int = 8, exp_name: str = "Def
 
     return cifar_trainset, cifar_validset, cifar_testset, num_classes
 
+def get_cifar100(cheatsheet: bool = False, cs_size: int = 8, exp_name: str = "Default", val_size: int = 2500):
+
+    # Get dataset's cheatsheet
+    cifar_trainset = datasets.CIFAR100(root='./data', train=True, download=True)
+    sheet = get_sheet(cifar_trainset)
+    num_classes = len(sheet.keys())
+    del cifar_trainset
+
+    transform = transforms.Compose(
+        [transforms.Lambda(lambda x: modify_image(x, sheet, cheatsheet, cs_size, num_classes, exp_name)),
+        transforms.ToTensor(),
+        transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+        
+    
+    cifar_trainset = datasets.CIFAR100(root='./data', train=True, download=True, transform=transform)
+    cifar_testset = datasets.CIFAR100(root='./data', train=False, download=True, transform=transform)
+
+    torch.manual_seed(43)
+    train_size = len(cifar_trainset) - val_size
+
+    cifar_trainset, cifar_validset = random_split(cifar_trainset, [train_size, val_size])
+
+    return cifar_trainset, cifar_validset, cifar_testset, num_classes
+
 
 def get_dataloaders(train_data, valid_data, test_data, batch_size: int = 32):
 
@@ -119,8 +143,8 @@ def get_dataloaders(train_data, valid_data, test_data, batch_size: int = 32):
     valid_sampler = SequentialSampler(valid_data)
     test_sampler = SequentialSampler(test_data)
 
-    train_dataloader = DataLoader(train_data, batch_size, num_workers=16, pin_memory=False, sampler=train_sampler)
-    valid_dataloader = DataLoader(valid_data, batch_size, num_workers=16, pin_memory=False, sampler=valid_sampler)
-    test_dataloader = DataLoader(test_data, batch_size, num_workers=16, pin_memory=False, sampler=test_sampler)
+    train_dataloader = DataLoader(train_data, batch_size, num_workers=1, pin_memory=False, sampler=train_sampler)
+    valid_dataloader = DataLoader(valid_data, batch_size, num_workers=1, pin_memory=False, sampler=valid_sampler)
+    test_dataloader = DataLoader(test_data, batch_size, num_workers=1, pin_memory=False, sampler=test_sampler)
 
     return train_dataloader, valid_dataloader, test_dataloader
