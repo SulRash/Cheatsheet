@@ -23,7 +23,7 @@ def get_sheet(train_dataset):
             sheet[label] = image
     return sheet
 
-def modify_image(image: Image, sheet: Dict, cheatsheet: bool = False, cs_size: int = 8, num_classes: int = 10, experiment_name: str = "Default") -> Image:
+def modify_image(image: Image, sheet: Dict, cheatsheet: bool = False, cs_size: int = 8, num_classes: int = 10, exp_name: str = "Default") -> Image:
     
     max_images_in_row = 10
     
@@ -52,16 +52,23 @@ def modify_image(image: Image, sheet: Dict, cheatsheet: bool = False, cs_size: i
                 cheatsheet_image = loc + (image_row*max_images_in_row)
 
                 modified.paste(sheet[cheatsheet_image].resize((cs_size, cs_size)), (x_loc, y_loc))
+        
+        left_over_black = max_images_in_row - remaining_images
+        if left_over_black:
+            x_loc = cs_size * (max_images_in_row - left_over_black)
+            y_loc = cs_size * (image_rows - 1)
+            modified.paste(Image.effect_noise((left_over_black*cs_size, cs_size), 25), (x_loc, y_loc))
+                           
     else:
         modified = image.resize((new_image_box, new_image_height))
-    
+            
     # Saves an example of the image
-    example_image_path = "examples/"+experiment_name+".jpg"
+    example_image_path = f"experiments/{exp_name}/example_image.jpg"
     if not os.path.isfile(example_image_path):
         modified.save(example_image_path)
     return modified
 
-def get_pets(cheatsheet: bool = False, cs_size: int = 8, experiment_name: str = "Default", val_size: int = 2500):
+def get_pets(cheatsheet: bool = False, cs_size: int = 8, exp_name: str = "Default", val_size: int = 2500):
 
     # Get dataset's cheatsheet
     oxfordpet_trainset = datasets.OxfordIIITPet(root='./data', download=True)
@@ -70,7 +77,7 @@ def get_pets(cheatsheet: bool = False, cs_size: int = 8, experiment_name: str = 
     del oxfordpet_trainset
 
     transform = transforms.Compose(
-        [transforms.Lambda(lambda x: modify_image(x, sheet, cheatsheet, cs_size, num_classes, experiment_name)),
+        [transforms.Lambda(lambda x: modify_image(x, sheet, cheatsheet, cs_size, num_classes, exp_name)),
         transforms.ToTensor(),
         transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
     
@@ -85,16 +92,16 @@ def get_pets(cheatsheet: bool = False, cs_size: int = 8, experiment_name: str = 
 
     return oxfordpet_trainset, oxfordpet_validset, oxfordpet_testset, num_classes
 
-def get_cifar10(cheatsheet: bool = False, cs_size: int = 8, experiment_name: str = "Default", val_size: int = 2500):
+def get_cifar10(cheatsheet: bool = False, cs_size: int = 8, exp_name: str = "Default", val_size: int = 2500):
 
     # Get dataset's cheatsheet
     cifar_trainset = datasets.CIFAR10(root='./data', train=True, download=True)
-    sheet = get_sheet(cifar_trainset, 10)
+    sheet = get_sheet(cifar_trainset)
     num_classes = len(sheet.keys())
     del cifar_trainset
 
     transform = transforms.Compose(
-        [transforms.Lambda(lambda x: modify_image(x, sheet, cheatsheet, cs_size, num_classes, experiment_name)),
+        [transforms.Lambda(lambda x: modify_image(x, sheet, cheatsheet, cs_size, num_classes, exp_name)),
         transforms.ToTensor(),
         transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
         

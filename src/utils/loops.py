@@ -58,6 +58,8 @@ def test(model, test_dataloader, epoch, exp_name, dataset_name: str):
                 class_total[label] += 1
 
     for i in range(len(classes)):
+
+        # TODO: Fix float division by 0
         accuracies[i] = 100 * class_correct[i] / class_total[i]
         print('Accuracy of %5s : %2d %%' %
             (classes[i], accuracies[i]))
@@ -73,13 +75,13 @@ def test(model, test_dataloader, epoch, exp_name, dataset_name: str):
         "Accuracy Per Class": acc_per_class
     }
 
-    append_json(results, f"results/{exp_name}.json")
+    append_json(results, f"experiments/{exp_name}/results.json")
 
 
 def compute_saliency_maps(model, inputs, targets):
     model.eval()
     inputs.requires_grad_()
-
+    
     outputs = model(inputs)
     loss = criterion(outputs, targets)
     loss.backward()
@@ -93,11 +95,15 @@ def denormalize(tensor, mean=[0.4914, 0.4822, 0.4465], std=[0.2023, 0.1994, 0.20
         t.mul_(s).add_(m)
     return tensor
 
-def visualize_and_save_saliency(images, saliencies, epoch, exp_name, directory='./saliency_maps/'):
-    for idx, (img, sal) in enumerate(zip(images, saliencies)):
-        denorm_img = denormalize(img.clone().detach())
-        torchvision.utils.save_image(denorm_img, f"./saliency_maps/original/epoch{epoch}_image{idx}.png")
-        # Save saliency map
-        sal_normalized = (sal - sal.min()) / (sal.max() - sal.min())
-        torchvision.utils.save_image(sal_normalized.unsqueeze(0), f"./saliency_maps/saliency/epoch{epoch}_saliency{idx}.png")   
+def visualize_and_save_saliency(images, labels, saliencies, epoch, exp_name):
+    one_each = {}
+    for _, (img, sal, lab) in enumerate(zip(images, saliencies, labels)):
+        if lab not in one_each.keys():
+            denorm_img = denormalize(img.clone().detach())
+            torchvision.utils.save_image(denorm_img, f"./experiments/{exp_name}/saliency_maps/original/epoch{epoch}_image{lab}.png")
+            
+            # Save saliency map
+            sal_normalized = (sal - sal.min()) / (sal.max() - sal.min())
+            torchvision.utils.save_image(sal_normalized.unsqueeze(0), f"./experiments/{exp_name}/saliency_maps/saliency/epoch{epoch}_saliency{lab}.png")
 
+            one_each[lab] = (img, sal)

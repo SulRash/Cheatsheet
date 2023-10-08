@@ -1,11 +1,18 @@
-import random
 import os
+import random
 import json
 
 import torch
 import numpy as np
 
-def set_random_seed(seed):
+def make_directories(exp_name: str):
+
+    subfolders = ['results/', 'saliency_maps/original/', 'saliency_maps/saliency/']
+
+    for subfolder in subfolders:
+        os.makedirs(os.path.join(f"experiments/{exp_name}/", subfolder), exist_ok=True)
+
+def set_random_seed(seed: int):
     if seed is not None:
         random.seed(seed)
         np.random.seed(seed)
@@ -28,9 +35,6 @@ def append_json(new_data, path):
     except:
         file_data = []
         print("Generating new experiment file")
-        if not os.path.exists("results/"):
-            os.mkdir("results/")
-        
 
     with open(path, "w+") as file:
         file_data.append(new_data)

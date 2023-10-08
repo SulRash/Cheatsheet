@@ -5,12 +5,13 @@ import torch.distributed as dist
 
 from models import get_model
 
-from utils.utils import set_random_seed
+from utils.utils import set_random_seed, make_directories
 from utils.arguments import get_args
 from utils.data import get_pets, get_cifar10, get_dataloaders
 from utils.loops import *
 
 def main(args):
+
     if args.dataset == "cifar":
         train_data, valid_data, test_data, num_classes = get_cifar10(args.cheatsheet, args.cs_size, args.exp_name)
     elif args.dataset == "pets":
@@ -45,11 +46,12 @@ def main(args):
             model.eval()
             new_loss = validation(model, valid_dataloader)
 
+            # TODO: Saliency map should save one of each class per epoch.
             images, labels = next(iter(valid_dataloader))
             images, labels = images.cuda(), labels.cuda()
             
             saliencies = compute_saliency_maps(model, images, labels)
-            visualize_and_save_saliency(images, saliencies, epoch, args.exp_name)
+            visualize_and_save_saliency(images, labels, saliencies, epoch, args.exp_name)
 
             # Prevent overfitting
             if new_loss > old_loss:
@@ -68,4 +70,5 @@ def main(args):
 
 if __name__ == "__main__":
     args = get_args()
+    make_directories(args.exp_name)
     main(args)
