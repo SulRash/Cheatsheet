@@ -23,7 +23,7 @@ def get_sheet(train_dataset):
             sheet[label] = image
     return sheet
 
-def modify_image(image: Image, sheet: Dict, cheatsheet: bool = False, cs_size: int = 8, num_classes: int = 10, exp_name: str = "Default") -> Image:
+def modify_image(image: Image, sheet: Dict, cheatsheet: bool = False, cs_size: int = 8, num_classes: int = 10, cheatsheet_only: bool = False) -> Image:
     
     max_images_in_row = 10
     
@@ -62,7 +62,11 @@ def modify_image(image: Image, sheet: Dict, cheatsheet: bool = False, cs_size: i
     else:
         modified = image.resize((new_image_box, new_image_height))
 
-    return modified
+    if cheatsheet_only:
+        if image in list(sheet.values()):
+            return modified
+    else:
+        return modified
 
 def get_pets(cheatsheet: bool = False, cs_size: int = 8, exp_name: str = "Default", val_size: int = 2500):
 
@@ -97,10 +101,9 @@ def get_cifar10(cheatsheet: bool = False, cs_size: int = 8, exp_name: str = "Def
     del cifar_trainset
 
     transform = transforms.Compose(
-        [transforms.Lambda(lambda x: modify_image(x, sheet, cheatsheet, cs_size, num_classes, exp_name)),
+        [transforms.Lambda(lambda x: modify_image(x, sheet, cheatsheet, cs_size, num_classes)),
         transforms.ToTensor(),
         transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
-        
     
     cifar_trainset = datasets.CIFAR10(root='./data', train=True, download=True, transform=transform)
     cifar_testset = datasets.CIFAR10(root='./data', train=False, download=True, transform=transform)
@@ -124,8 +127,6 @@ def get_cifar100(cheatsheet: bool = False, cs_size: int = 8, exp_name: str = "De
         [transforms.Lambda(lambda x: modify_image(x, sheet, cheatsheet, cs_size, num_classes, exp_name)),
         transforms.ToTensor(),
         transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
-        
-    
     cifar_trainset = datasets.CIFAR100(root='./data', train=True, download=True, transform=transform)
     cifar_testset = datasets.CIFAR100(root='./data', train=False, download=True, transform=transform)
 
@@ -135,6 +136,18 @@ def get_cifar100(cheatsheet: bool = False, cs_size: int = 8, exp_name: str = "De
     cifar_trainset, cifar_validset = random_split(cifar_trainset, [train_size, val_size])
 
     return cifar_trainset, cifar_validset, cifar_testset, num_classes
+
+def get_cs_only_dataloader(train_data, batch_size, dataset_cls, cs_size):
+
+    transform_csonly = transforms.Compose(
+        [transforms.Lambda(lambda x: modify_image(x, sheet, cheatsheet, cs_size, num_classes, True)),
+        transforms.ToTensor(),
+        transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+
+    train_sampler = DistributedSampler(train_data)
+    train_dataloader = DataLoader(train_data, batch_size, num_workers=1, pin_memory=False, sampler=train_sampler)
+
+    return train_dataloader
 
 
 def get_dataloaders(train_data, valid_data, test_data, batch_size: int = 32):

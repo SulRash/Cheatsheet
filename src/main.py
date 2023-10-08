@@ -37,6 +37,12 @@ def main(args):
     if args.load_dir and args.ckpt_id:
         model.load_checkpoint(args.load_dir, args.ckpt_id)
 
+
+    # Learning cheatsheet loop
+    for epoch in range(5):
+        
+
+    # Actual training loop
     for epoch in range(args.train_epochs):
 
         model.train()
