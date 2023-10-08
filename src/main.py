@@ -65,7 +65,7 @@ def main(args):
 
 
         if not epoch % args.save_interval:
-            model.save_checkpoint(args.save_dir+args.exp_name+"/", epoch)
+            model.save_checkpoint(f"experiments/{args.exp_name}/checkpoints/", epoch)
         
 
 if __name__ == "__main__":
