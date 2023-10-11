@@ -17,6 +17,7 @@ def train(model, train_dataloader):
         loss = criterion(outputs, labels)
         model.backward(loss)
         model.step()
+    return loss
 
 def validation(model, valid_dataloader):
     losses = 0
@@ -82,6 +83,7 @@ def test(model, test_dataloader, epoch, exp_name, dataset_name: str):
 
     append_json(results, f"experiments/{exp_name}/results.json")
 
+    return total_acc
 
 def compute_saliency_maps(model, inputs, targets):
     model.eval()

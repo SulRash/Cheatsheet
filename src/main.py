@@ -1,5 +1,6 @@
 import torch
 import deepspeed
+import wandb
 
 import torch.distributed as dist
 
@@ -11,6 +12,13 @@ from utils.data import get_cifar, get_dataloaders
 from utils.loops import *
 
 def main(args):
+
+    if dist.get_rank() == 0:
+        wandb.init(
+            project='Cheatsheet',
+            name=args.exp_name,
+            config=vars(args)
+        )
 
     train_data, valid_data, test_data, num_classes = get_cifar(
          dataset=args.dataset,
@@ -40,11 +48,19 @@ def main(args):
     for epoch in range(args.train_epochs):
 
         model.train()
-        train(model, train_dataloader)
+        train_loss = train(model, train_dataloader)
         
         if dist.get_rank() == 0:
             model.eval()
-            new_loss = validation(model, valid_dataloader)
+            val_loss = validation(model, valid_dataloader)
+
+            metrics = {
+                "train/train_loss": train_loss,
+                "train/epoch": epoch,
+                "val/val_loss": val_loss
+            }
+
+            wandb.log(metrics)
 
             images, labels = next(iter(valid_dataloader))
             images, labels = images.cuda(), labels.cuda()
@@ -53,7 +69,8 @@ def main(args):
             visualize_and_save_saliency(images, labels, saliencies, epoch, args.exp_name)
 
             if not epoch % args.test_interval:
-                    test(model, test_dataloader, epoch, args.exp_name, args.dataset)
+                test_acc = test(model, test_dataloader, epoch, args.exp_name, args.dataset)
+                wandb.log({"train/epoch": epoch, "test/total_acc": test_acc})
         
         dist.barrier()
 
