@@ -8,6 +8,7 @@ from torch.utils.data.distributed import DistributedSampler
 
 from datasets.cifar_cheatsheet import CIFAR_Cheatsheet
 from transforms.addcheatsheet import AddCheatsheet
+from transforms.tobfloat16 import ToBfloat16
 
 def get_sheet(train_dataset):
     sheet = {}
@@ -36,6 +37,7 @@ def get_cifar(dataset: str = "cifar10", cheatsheet: bool = False, randomize_shee
 
     img_transform = transforms.Compose(
         [transforms.ToTensor(),
+        ToBfloat16(),
         transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
 
     cifar_trainset = CIFAR_Cheatsheet(dataset_name=dataset, root='./data', train=True, download=True, transform=transform, img_transform=img_transform)

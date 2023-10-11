@@ -3,6 +3,10 @@
 
     "steps_per_print": 25,
 
+    "bf16": {
+      "enabled": true
+    },
+
     "optimizer": {
         "type": "Adam",
         "params": {
@@ -13,6 +17,16 @@
           ],
           "eps": 1e-8,
           "weight_decay": 3e-7
+        }
+    },
+
+    "scheduler": {
+      "type": "WarmupDecayLR",
+      "params": {
+          "warmup_min_lr": 0,
+          "warmup_max_lr": 1e-3,
+          "warmup_num_steps": 2500,
+          "total_num_steps": 20000
         }
     }
 }
