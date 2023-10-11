@@ -30,7 +30,7 @@ class AddCheatsheet():
             if self.randomize_sheet:
                 sheet, target = self.change_reference(target)
 
-            self.add_cheatsheet_rows(
+            modified = self.add_cheatsheet_rows(
                 img=img,
                 sheet=sheet,
                 max_images_in_row=max_images_in_row,
@@ -43,10 +43,10 @@ class AddCheatsheet():
 
         if self.cheatsheet_only:
             if img in list(self.sheet.values()):
-                return modified
+                return modified, target
             
         else:
-            return modified
+            return modified, target
     
     def add_cheatsheet_rows(self, img, sheet, max_images_in_row, new_image_box, new_image_height, additional_rows):
 
@@ -74,6 +74,8 @@ class AddCheatsheet():
             x_loc = self.cs_size * (max_images_in_row - left_over_black)
             y_loc = self.cs_size * (image_rows - 1)
             modified.paste(Image.effect_noise((left_over_black*self.cs_size, self.cs_size), 25), (x_loc, y_loc))
+        
+        return modified
 
     def change_reference(self, target):
     

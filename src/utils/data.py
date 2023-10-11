@@ -7,7 +7,7 @@ from torch.utils.data.dataloader import DataLoader, SequentialSampler
 from torch.utils.data.distributed import DistributedSampler
 
 from datasets.cifar_cheatsheet import CIFAR_Cheatsheet
-from src.transforms.addcheatsheet import AddCheatsheet
+from transforms.addcheatsheet import AddCheatsheet
 
 def get_sheet(train_dataset):
     sheet = {}

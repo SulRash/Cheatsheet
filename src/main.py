@@ -17,7 +17,6 @@ def main(args):
          cheatsheet=args.cheatsheet,
          randomize_sheet=args.randomize_sheet,
          cs_size=args.cs_size,
-         exp_name=args.exp_name,
          val_size=500
     )
     
