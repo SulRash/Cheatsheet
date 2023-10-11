@@ -6,4 +6,5 @@ experiments/
 src/datasets/__pycache__/
 src/transforms/__pycache__/
 src/conf/ds_config.json
+wandb/
 run.sh

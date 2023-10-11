@@ -13,16 +13,6 @@ from utils.loops import *
 
 def main(args):
 
-    if dist.get_rank() == 0:
-        run = wandb.init(
-            project='Cheatsheet',
-            notes=args.exp_name,
-            config=vars(args)
-        )
-        deepspeed_artifact = wandb.Artifact(name="deepspeed", type="config")
-        deepspeed_artifact.add_dir(local_path="src/conf/")
-        run.log_artifact(deepspeed_artifact)
-
     train_data, valid_data, test_data, num_classes = get_cifar(
          dataset=args.dataset,
          cheatsheet=args.cheatsheet,
@@ -34,6 +24,16 @@ def main(args):
     if args.local_rank != -1:
         torch.cuda.set_device(args.local_rank)
         deepspeed.init_distributed()
+
+        if dist.get_rank() == 0:
+            run = wandb.init(
+                project='Cheatsheet',
+                notes=args.exp_name,
+                config=vars(args)
+            )
+            deepspeed_artifact = wandb.Artifact(name="deepspeed", type="config")
+            deepspeed_artifact.add_dir(local_path="src/conf/")
+            run.log_artifact(deepspeed_artifact)
 
     train_dataloader, valid_dataloader, test_dataloader = get_dataloaders(train_data, valid_data, test_data, args.batch_size)
 
