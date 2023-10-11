@@ -16,17 +16,20 @@ def main(args):
     if dist.get_rank() == 0:
         wandb.init(
             project='Cheatsheet',
-            name=args.exp_name,
             config=vars(args)
         )
+        
+        run = wandb.init(project="artifacts-example", job_type="add-saliency")
+
 
     train_data, valid_data, test_data, num_classes = get_cifar(
          dataset=args.dataset,
          cheatsheet=args.cheatsheet,
          randomize_sheet=args.randomize_sheet,
          cs_size=args.cs_size,
-         val_size=500
+         val_size=1500
     )
+
     
     if args.local_rank != -1:
         torch.cuda.set_device(args.local_rank)
@@ -64,9 +67,13 @@ def main(args):
 
             images, labels = next(iter(valid_dataloader))
             images, labels = images.cuda(), labels.cuda()
-            
+
             saliencies = compute_saliency_maps(model, images, labels)
             visualize_and_save_saliency(images, labels, saliencies, epoch, args.exp_name)
+
+            artifact = wandb.Artifact(name="saliencies", type="results")
+            artifact.add_dir(local_path=f"experiments/{args.exp_name}/saliency_maps")
+            run.log_artifact(artifact)
 
             if not epoch % args.test_interval:
                 test_acc = test(model, test_dataloader, epoch, args.exp_name, args.dataset)
