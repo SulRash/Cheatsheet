@@ -54,5 +54,6 @@ class AddCheatsheet():
         if self.cheatsheet_only:
             if img in list(self.sheet.values()):
                 return modified
+            
         else:
             return modified
