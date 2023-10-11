@@ -3,5 +3,7 @@ data/
 src/utils/__pycache__/
 src/models/__pycache__/
 experiments/
+src/datasets/__pycache__/
+src/transforms/__pycache__/
 src/conf/ds_config.json
 run.sh
