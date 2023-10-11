@@ -23,51 +23,6 @@ def get_sheet(train_dataset):
             sheet[label] = image
     return sheet
 
-def modify_image(image: Image, sheet: Dict, cheatsheet: bool = False, cs_size: int = 8, num_classes: int = 10, cheatsheet_only: bool = False) -> Image:
-    
-    max_images_in_row = 10
-    
-    new_image_box = cs_size * max_images_in_row
-    additional_rows = cs_size * ceil(int(num_classes)/max_images_in_row)
-    new_image_height = cs_size * max_images_in_row + additional_rows
-    
-    # Adds a single column for the cheatsheet
-    if cheatsheet:
-        
-        upscaled_image = image.resize((new_image_box, new_image_box))
-        modified = Image.new('RGB', (new_image_box, new_image_height))
-        modified.paste(upscaled_image, (0, additional_rows))
-        
-        image_rows = int(additional_rows/cs_size)
-        for image_row in range(image_rows):
-            
-            remaining_images = min(len(sheet.keys()) - (max_images_in_row*image_row), max_images_in_row)
-            for loc in range(remaining_images):
-                
-                # Set x and y axis locations to paste in cheatsheet image
-                x_loc = cs_size * loc
-                y_loc = cs_size * image_row
-
-                # Get number of cheatsheet image
-                cheatsheet_image = loc + (image_row*max_images_in_row)
-
-                modified.paste(sheet[cheatsheet_image].resize((cs_size, cs_size)), (x_loc, y_loc))
-        
-        left_over_black = max_images_in_row - remaining_images
-        if left_over_black:
-            x_loc = cs_size * (max_images_in_row - left_over_black)
-            y_loc = cs_size * (image_rows - 1)
-            modified.paste(Image.effect_noise((left_over_black*cs_size, cs_size), 25), (x_loc, y_loc))
-                           
-    else:
-        modified = image.resize((new_image_box, new_image_height))
-
-    if cheatsheet_only:
-        if image in list(sheet.values()):
-            return modified
-    else:
-        return modified
-
 def get_pets(cheatsheet: bool = False, cs_size: int = 8, exp_name: str = "Default", val_size: int = 2500):
 
     # Get dataset's cheatsheet
@@ -127,6 +82,7 @@ def get_cifar100(cheatsheet: bool = False, cs_size: int = 8, exp_name: str = "De
         [transforms.Lambda(lambda x: modify_image(x, sheet, cheatsheet, cs_size, num_classes, exp_name)),
         transforms.ToTensor(),
         transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+    
     cifar_trainset = datasets.CIFAR100(root='./data', train=True, download=True, transform=transform)
     cifar_testset = datasets.CIFAR100(root='./data', train=False, download=True, transform=transform)
 
@@ -137,7 +93,9 @@ def get_cifar100(cheatsheet: bool = False, cs_size: int = 8, exp_name: str = "De
 
     return cifar_trainset, cifar_validset, cifar_testset, num_classes
 
-def get_cs_only_dataloader(train_data, batch_size, dataset_cls, cs_size):
+def get_cs_only_dataloader(batch_size, cheatsheet, cs_size, dataset_cls):
+
+    train_data = dataset_cls(root='./data', train=True)
 
     transform_csonly = transforms.Compose(
         [transforms.Lambda(lambda x: modify_image(x, sheet, cheatsheet, cs_size, num_classes, True)),
