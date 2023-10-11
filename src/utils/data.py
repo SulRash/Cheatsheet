@@ -54,8 +54,8 @@ def get_dataloaders(train_data, valid_data, test_data, batch_size: int = 32):
     valid_sampler = SequentialSampler(valid_data)
     test_sampler = SequentialSampler(test_data)
 
-    train_dataloader = DataLoader(train_data, batch_size, num_workers=1, pin_memory=False, sampler=train_sampler)
-    valid_dataloader = DataLoader(valid_data, batch_size, num_workers=1, pin_memory=False, sampler=valid_sampler)
-    test_dataloader = DataLoader(test_data, batch_size, num_workers=1, pin_memory=False, sampler=test_sampler)
+    train_dataloader = DataLoader(train_data, batch_size, num_workers=2, pin_memory=False, sampler=train_sampler)
+    valid_dataloader = DataLoader(valid_data, batch_size, num_workers=2, pin_memory=False, sampler=valid_sampler)
+    test_dataloader = DataLoader(test_data, batch_size, num_workers=2, pin_memory=False, sampler=test_sampler)
 
     return train_dataloader, valid_dataloader, test_dataloader
