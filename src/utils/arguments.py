@@ -5,6 +5,7 @@ import deepspeed
 def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--cheatsheet', action="store_true")
+    parser.add_argument('--randomize_sheet', action="store_true")
     parser.add_argument('--cs_size', type=int, default=8)
     parser.add_argument('--dataset', type=str, choices=['cifar10', 'cifar100'], default='cifar10')
 

@@ -17,7 +17,7 @@ def get_sheet(train_dataset):
             sheet[label] = image
     return sheet
 
-def get_cifar(dataset: str = "cifar10", cheatsheet: bool = False, cs_size: int = 8, exp_name: str = "Default", val_size: int = 2500):
+def get_cifar(dataset: str = "cifar10", cheatsheet: bool = False, randomize_sheet: bool = False, cs_size: int = 8, val_size: int = 2500):
     
     # Get dataset's cheatsheet
     cifar_trainset = CIFAR_Cheatsheet(dataset_name=dataset, root='./data', train=True, download=True)
@@ -30,7 +30,8 @@ def get_cifar(dataset: str = "cifar10", cheatsheet: bool = False, cs_size: int =
         cheatsheet=cheatsheet,
         cs_size=cs_size,
         num_classes=num_classes,
-        cheatsheet_only=False
+        cheatsheet_only=False,
+        randomize_sheet=randomize_sheet
     )
 
     img_transform = transforms.Compose(
@@ -46,20 +47,6 @@ def get_cifar(dataset: str = "cifar10", cheatsheet: bool = False, cs_size: int =
     cifar_trainset, cifar_validset = random_split(cifar_trainset, [train_size, val_size])
 
     return cifar_trainset, cifar_validset, cifar_testset, num_classes
-
-def get_cs_only_dataloader(batch_size, cheatsheet, cs_size, dataset_cls):
-
-    train_data = dataset_cls(root='./data', train=True)
-
-    transform_csonly = transforms.Compose(
-        [transforms.Lambda(lambda x: modify_image(x, sheet, cheatsheet, cs_size, num_classes, True)),
-        transforms.ToTensor(),
-        transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
-
-    train_sampler = DistributedSampler(train_data)
-    train_dataloader = DataLoader(train_data, batch_size, num_workers=1, pin_memory=False, sampler=train_sampler)
-
-    return train_dataloader
 
 def get_dataloaders(train_data, valid_data, test_data, batch_size: int = 32):
 

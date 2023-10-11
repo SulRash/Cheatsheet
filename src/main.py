@@ -15,6 +15,7 @@ def main(args):
     train_data, valid_data, test_data, num_classes = get_cifar(
          dataset=args.dataset,
          cheatsheet=args.cheatsheet,
+         randomize_sheet=args.randomize_sheet,
          cs_size=args.cs_size,
          exp_name=args.exp_name,
          val_size=500

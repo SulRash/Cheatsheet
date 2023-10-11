@@ -88,9 +88,4 @@ class AddCheatsheet():
 
         target = replacement_id
 
-
         return new_sheet, target
-
-        
-        
-        
