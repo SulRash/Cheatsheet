@@ -14,13 +14,12 @@ from utils.loops import *
 def main(args):
 
     if dist.get_rank() == 0:
+        
         wandb.init(
             project='Cheatsheet',
             config=vars(args)
         )
-        
         run = wandb.init(project="artifacts-example", job_type="add-saliency")
-
 
     train_data, valid_data, test_data, num_classes = get_cifar(
          dataset=args.dataset,
@@ -29,7 +28,6 @@ def main(args):
          cs_size=args.cs_size,
          val_size=1500
     )
-
     
     if args.local_rank != -1:
         torch.cuda.set_device(args.local_rank)
@@ -57,19 +55,18 @@ def main(args):
             model.eval()
             val_loss = validation(model, valid_dataloader)
 
-            metrics = {
-                "train/train_loss": train_loss,
-                "train/epoch": epoch,
-                "val/val_loss": val_loss
-            }
-
-            wandb.log(metrics)
-
             images, labels = next(iter(valid_dataloader))
             images, labels = images.cuda(), labels.cuda()
 
             saliencies = compute_saliency_maps(model, images, labels)
             visualize_and_save_saliency(images, labels, saliencies, epoch, args.exp_name)
+
+            metrics = {
+                "train/train_loss": train_loss,
+                "train/epoch": epoch,
+                "val/val_loss": val_loss
+            }
+            wandb.log(metrics)
 
             artifact = wandb.Artifact(name="saliencies", type="results")
             artifact.add_dir(local_path=f"experiments/{args.exp_name}/saliency_maps")
