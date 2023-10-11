@@ -1,3 +1,8 @@
+from math import ceil
+from typing import Dict
+
+from PIL import Image
+
 class AddCheatsheet():
 
     def __init__(self, sheet: Dict, cheatsheet: bool = False, cs_size: int = 8, num_classes: int = 10, cheatsheet_only: bool = False):
@@ -18,7 +23,7 @@ class AddCheatsheet():
         # Adds rows on the top for the cheatsheet
         if self.cheatsheet:
             
-            upscaled_image = image.resize((new_image_box, new_image_box))
+            upscaled_image = img.resize((new_image_box, new_image_box))
             modified = Image.new('RGB', (new_image_box, new_image_height))
             modified.paste(upscaled_image, (0, additional_rows))
             
@@ -44,10 +49,10 @@ class AddCheatsheet():
                 modified.paste(Image.effect_noise((left_over_black*self.cs_size, self.cs_size), 25), (x_loc, y_loc))
                             
         else:
-            modified = image.resize((new_image_box, new_image_height))
+            modified = img.resize((new_image_box, new_image_height))
 
         if self.cheatsheet_only:
-            if image in list(sheet.values()):
+            if img in list(self.sheet.values()):
                 return modified
         else:
             return modified

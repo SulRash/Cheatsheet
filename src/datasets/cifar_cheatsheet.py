@@ -1,7 +1,7 @@
-from torchvision.datasets.cifar import CIFAR10
-
 from typing import Any, Callable, Optional, Tuple
 
+from torchvision.datasets.cifar import CIFAR10
+from PIL import Image
 
 class CIFAR_Cheatsheet(CIFAR10):
 
@@ -57,7 +57,7 @@ class CIFAR_Cheatsheet(CIFAR10):
                 "key": "fine_label_names",
                 "md5": "7973b15100ade9c7d40fb424638fde48",
             }
-        super(self).__init__()
+        super().__init__(root, train, transform, target_transform, download)
         
         self.img_transform = img_transform
 
