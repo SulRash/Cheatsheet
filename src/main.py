@@ -14,12 +14,14 @@ from utils.loops import *
 def main(args):
 
     if dist.get_rank() == 0:
-        
-        wandb.init(
+        run = wandb.init(
             project='Cheatsheet',
+            notes=args.exp_name,
             config=vars(args)
         )
-        run = wandb.init(project="artifacts-example", job_type="add-saliency")
+        deepspeed_artifact = wandb.Artifact(name="deepspeed", type="config")
+        deepspeed_artifact.add_dir(local_path="src/conf/")
+        run.log_artifact(deepspeed_artifact)
 
     train_data, valid_data, test_data, num_classes = get_cifar(
          dataset=args.dataset,
@@ -66,11 +68,11 @@ def main(args):
                 "train/epoch": epoch,
                 "val/val_loss": val_loss
             }
-            wandb.log(metrics)
+            run.log(metrics)
 
-            artifact = wandb.Artifact(name="saliencies", type="results")
-            artifact.add_dir(local_path=f"experiments/{args.exp_name}/saliency_maps")
-            run.log_artifact(artifact)
+            saliency_artifact = wandb.Artifact(name="saliencies", type="results")
+            saliency_artifact.add_dir(local_path=f"experiments/{args.exp_name}/saliency_maps")
+            run.log_artifact(saliency_artifact)
 
             if not epoch % args.test_interval:
                 test_acc = test(model, test_dataloader, epoch, args.exp_name, args.dataset)
