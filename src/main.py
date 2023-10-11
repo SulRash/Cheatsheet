@@ -7,17 +7,18 @@ from models import get_model
 
 from utils.utils import set_random_seed, setup_experiment
 from utils.arguments import get_args
-from utils.data import get_pets, get_cifar10, get_cifar100, get_dataloaders
+from utils.data import get_cifar, get_dataloaders
 from utils.loops import *
 
 def main(args):
 
-    if args.dataset == "cifar":
-        train_data, valid_data, test_data, num_classes = get_cifar10(args.cheatsheet, args.cs_size, args.exp_name)
-    if args.dataset == "cifar100":
-        train_data, valid_data, test_data, num_classes = get_cifar100(args.cheatsheet, args.cs_size, args.exp_name)
-    elif args.dataset == "pets":
-        train_data, valid_data, test_data, num_classes = get_pets(args.cheatsheet, args.cs_size, args.exp_name)
+    train_data, valid_data, test_data, num_classes = get_cifar(
+         dataset=args.dataset,
+         cheatsheet=args.cheatsheet,
+         cs_size=args.cs_size,
+         exp_name=args.exp_name,
+         val_size=500
+    )
     
     if args.local_rank != -1:
         torch.cuda.set_device(args.local_rank)
@@ -29,18 +30,11 @@ def main(args):
     dist.barrier()
 
     model = get_model(args.model, num_classes, args.cs_size)
-
     parameters = filter(lambda p: p.requires_grad, model.parameters())
-
-    model, optimizer, _, _ = deepspeed.initialize(args=args, model=model, model_parameters=parameters)
+    model, _, _, _ = deepspeed.initialize(args=args, model=model, model_parameters=parameters)
     
     if args.load_dir and args.ckpt_id:
         model.load_checkpoint(args.load_dir, args.ckpt_id)
-
-
-    # Learning cheatsheet loop
-    for epoch in range(5):
-        
 
     # Actual training loop
     for epoch in range(args.train_epochs):
