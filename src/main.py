@@ -31,7 +31,7 @@ def main(args):
                 notes=args.exp_name,
                 config=vars(args)
             )
-            deepspeed_artifact = wandb.Artifact(name="deepspeed", type="config")
+            deepspeed_artifact = wandb.Artifact(name=f"deepspeed-{args.exp_name}", type="config")
             deepspeed_artifact.add_dir(local_path="src/conf/")
             run.log_artifact(deepspeed_artifact)
 
@@ -70,7 +70,7 @@ def main(args):
             }
             run.log(metrics)
 
-            saliency_artifact = wandb.Artifact(name="saliencies", type="results")
+            saliency_artifact = wandb.Artifact(name=f"saliencies-{args.exp_name}", type="results")
             saliency_artifact.add_dir(local_path=f"experiments/{args.exp_name}/saliency_maps")
             run.log_artifact(saliency_artifact)
 
