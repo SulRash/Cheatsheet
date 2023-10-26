@@ -7,14 +7,16 @@ from PIL import Image
 
 class AddCheatsheet():
 
-    def __init__(self, sheet: Dict, cheatsheet: bool = False, cs_size: int = 8, num_classes: int = 10, cheatsheet_only: bool = False, randomize_sheet: bool = False, one_image: bool = False, one_image_per_class: bool = False) -> None:
+    def __init__(self, sheet: Dict, num_classes: int, args) -> None:
         self.sheet = sheet
-        self.cheatsheet = cheatsheet
-        self.cs_size = cs_size
         self.num_classes = num_classes
-        self.cheatsheet_only = cheatsheet_only
-        self.randomize_sheet = randomize_sheet
-        self.one_image = one_image
+
+        self.cheatsheet = args.cheatsheet
+        self.cs_size = args.cs_size
+        self.cheatsheet_only = args.cheatsheet_only
+        self.randomize_sheet = args.randomize_sheet
+        self.one_image = args.one_image
+        self.one_image_per_class = args.one_image_per_class
 
     def __call__(self, img: Image, target: int):
 

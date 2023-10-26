@@ -13,15 +13,7 @@ from utils.loops import *
 
 def main(args):
 
-    train_data, valid_data, test_data, num_classes = get_cifar(
-         dataset=args.dataset,
-         cheatsheet=args.cheatsheet,
-         randomize_sheet=args.randomize_sheet,
-         cs_size=args.cs_size,
-         val_size=1500,
-         one_image=args.one_image,
-         one_image_per_class=args.one_image_per_class
-    )
+    train_data, valid_data, test_data, num_classes = get_cifar(args)
     
     if args.local_rank != -1:
         torch.cuda.set_device(args.local_rank)

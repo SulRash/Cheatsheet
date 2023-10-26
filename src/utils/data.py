@@ -18,37 +18,28 @@ def get_sheet(train_dataset):
             sheet[label] = image
     return sheet
 
-def get_cifar(dataset: str = "cifar10", cheatsheet: bool = False, randomize_sheet: bool = False, cs_size: int = 8, val_size: int = 2500, one_image: bool = False, one_image_per_class: bool = False):
+def get_cifar(args):
     
     # Get dataset's cheatsheet
-    cifar_trainset = CIFAR_Cheatsheet(dataset_name=dataset, root='./data', train=True, download=True)
+    cifar_trainset = CIFAR_Cheatsheet(dataset_name=args.dataset, root='./data', train=True, download=True)
     sheet = get_sheet(cifar_trainset)
     num_classes = len(sheet.keys())
     del cifar_trainset
 
-    transform = AddCheatsheet(
-        sheet=sheet,
-        cheatsheet=cheatsheet,
-        cs_size=cs_size,
-        num_classes=num_classes,
-        cheatsheet_only=False,
-        randomize_sheet=randomize_sheet,
-        one_image=one_image,
-        one_image_per_class=one_image_per_class
-    )
+    transform = AddCheatsheet(sheet, num_classes, args)
 
     img_transform = transforms.Compose(
         [transforms.ToTensor(),
         ToBfloat16(),
         transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
 
-    cifar_trainset = CIFAR_Cheatsheet(dataset_name=dataset, root='./data', train=True, download=True, transform=transform, img_transform=img_transform)
-    cifar_testset = CIFAR_Cheatsheet(dataset_name=dataset, root='./data', train=False, download=True, transform=transform, img_transform=img_transform)
+    cifar_trainset = CIFAR_Cheatsheet(dataset_name=args.dataset, root='./data', train=True, download=True, transform=transform, img_transform=img_transform)
+    cifar_testset = CIFAR_Cheatsheet(dataset_name=args.dataset, root='./data', train=False, download=True, transform=transform, img_transform=img_transform)
 
     torch.manual_seed(43)
-    train_size = len(cifar_trainset) - val_size
+    train_size = len(cifar_trainset) - args.val_size
 
-    cifar_trainset, cifar_validset = random_split(cifar_trainset, [train_size, val_size])
+    cifar_trainset, cifar_validset = random_split(cifar_trainset, [train_size, args.val_size])
 
     return cifar_trainset, cifar_validset, cifar_testset, num_classes
 
