@@ -21,9 +21,19 @@ def main(args):
         deepspeed.init_distributed()
 
     if dist.get_rank() == 0:
-        run = initial_logging(args)
-    dist.barrier()
-    
+        run = wandb.init(
+            project='Cheatsheet',
+            notes=args.exp_name,
+            config=vars(args)
+        )
+        deepspeed_artifact = wandb.Artifact(name=f"deepspeed-{args.exp_name}", type="config")
+        deepspeed_artifact.add_dir(local_path="src/conf/")
+        run.log_artifact(deepspeed_artifact)
+
+        hparams_artifact = wandb.Artifact(name=f"hparams-{args.exp_name}", type="config")
+        hparams_artifact.add_dir(local_path=f"experiments/{args.exp_name}/hparams.json")
+        run.log_artifact(deepspeed_artifact)
+
     train_dataloader, test_dataloader = get_dataloaders(train_data, test_data, args.batch_size)
 
     set_random_seed(args.seed)
@@ -54,8 +64,14 @@ def main(args):
                 saliencies = compute_saliency_maps(model, images, labels)
                 visualize_and_save_saliency(images, labels, saliencies, epoch, args.exp_name)
 
-                log_saliency_maps(args, run)
-        
+                saliency_artifact = wandb.Artifact(name=f"saliencies-{args.exp_name}", type="results")
+                saliency_artifact.add_dir(local_path=f"experiments/{args.exp_name}/saliency_maps/saliency/epoch{epoch}")
+                run.log_artifact(saliency_artifact)
+
+                originals_artifact = wandb.Artifact(name=f"saliencies-{args.exp_name}", type="results")
+                originals_artifact.add_dir(local_path=f"experiments/{args.exp_name}/saliency_maps/originals/")
+                run.log_artifact(originals_artifact)
+                
         dist.barrier()
 
         model.train()
