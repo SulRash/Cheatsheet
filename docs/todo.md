@@ -30,6 +30,10 @@ Masking the reference image corresponding to the label randomly during training 
 
 # Data
 
+## Flip Cheatsheet
+
+Try just flipping the cheatsheet, a more expensive and less naive way 
+
 ## Try Loading Cheatsheet at the Top Instead of Bottom
 
 ## Datasets

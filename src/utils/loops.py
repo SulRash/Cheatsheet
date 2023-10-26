@@ -1,3 +1,5 @@
+import os
+
 import torch
 import torch.nn as nn
 
@@ -6,9 +8,8 @@ from torchvision.utils import save_image
 from utils.utils import append_json
 
 criterion = nn.CrossEntropyLoss()
-classes = ('plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse','ship', 'truck')
 
-def train_cifar(model, train_dataloader):
+def train(model, train_dataloader):
     for step, batch in enumerate(train_dataloader):
         inputs = batch[0].to(model.device)
         labels = batch[1].to(model.device)
@@ -16,8 +17,9 @@ def train_cifar(model, train_dataloader):
         loss = criterion(outputs, labels)
         model.backward(loss)
         model.step()
+    return loss
 
-def valid_cifar(model, valid_dataloader):
+def validation(model, valid_dataloader):
     losses = 0
     for step, batch in enumerate(valid_dataloader):
         inputs = batch[0].to(model.device)
@@ -32,27 +34,37 @@ def valid_cifar(model, valid_dataloader):
     print("="*25)
     return losses
 
-def test_cifar(model, test_dataloader, epoch, exp_name):
-    class_correct = list(0. for i in range(10))
-    class_total = list(0. for i in range(10))
+def test(model, dataloader, epoch, exp_name, dataset_name: str, split: str = "test"):
+    
+    if dataset_name == "cifar10":
+        classes  = [str(i) for i in range(10)]
+    elif dataset_name == "pets":
+        classes = [str(i) for i in range(37)]
+    elif dataset_name == "cifar100":
+        classes = [str(i) for i in range(100)]
 
-    accuracies = [0]*10
+    class_correct = list(0. for i in range(len(classes)))
+    class_total = list(0. for i in range(len(classes)))
+
+    accuracies = [0]*len(classes)
     acc_per_class = {}
-
     with torch.no_grad():
-        for data in test_dataloader:
+        for data in dataloader:
             images, labels = data
             images = images.to(model.device)
             labels = labels.to(model.device)
             outputs = model(images)
             _, predicted = torch.max(outputs, 1)
             c = (predicted == labels).squeeze()
-            for i in range(4):
+
+            for i in range(len(labels)):
                 label = labels[i]
                 class_correct[label] += c[i].item()
                 class_total[label] += 1
 
-    for i in range(10):
+    for i in range(len(classes)):
+
+        # TODO: Fix float division by 0
         accuracies[i] = 100 * class_correct[i] / class_total[i]
         print('Accuracy of %5s : %2d %%' %
             (classes[i], accuracies[i]))
@@ -63,18 +75,21 @@ def test_cifar(model, test_dataloader, epoch, exp_name):
 
 
     results = {
-        "Epoch": epoch,
-        "Total Accuracy": total_acc,
-        "Accuracy Per Class": acc_per_class
+        split: {
+            "Epoch": epoch,
+            "Total Accuracy": total_acc,
+            "Accuracy Per Class": acc_per_class
+        }
     }
 
-    append_json(results, f"results/{exp_name}.json")
+    append_json(results, f"experiments/{exp_name}/results.json")
 
+    return total_acc
 
 def compute_saliency_maps(model, inputs, targets):
     model.eval()
     inputs.requires_grad_()
-
+    
     outputs = model(inputs)
     loss = criterion(outputs, targets)
     loss.backward()
@@ -88,11 +103,22 @@ def denormalize(tensor, mean=[0.4914, 0.4822, 0.4465], std=[0.2023, 0.1994, 0.20
         t.mul_(s).add_(m)
     return tensor
 
-def visualize_and_save_saliency(images, saliencies, epoch, exp_name, directory='./saliency_maps/'):
-    for idx, (img, sal) in enumerate(zip(images, saliencies)):
-        denorm_img = denormalize(img.clone().detach())
-        torchvision.utils.save_image(denorm_img, f"./saliency_maps2/original/epoch{epoch}_image{idx}.png")
-        # Save saliency map
-        sal_normalized = (sal - sal.min()) / (sal.max() - sal.min())
-        torchvision.utils.save_image(sal_normalized.unsqueeze(0), f"./saliency_maps2/saliency/epoch{epoch}_saliency{idx}.png")   
+def visualize_and_save_saliency(images, labels, saliencies, epoch, exp_name):    
+    
+    directory = f"./experiments/{exp_name}/saliency_maps"
+    original_dir = f"{directory}/originals/"
+    saliency_dir = f"{directory}/saliency/epoch{epoch}/"
+    os.makedirs(saliency_dir, exist_ok=True)
+    
+    one_each = {}
 
+    for _, (img, sal, lab) in enumerate(zip(images, saliencies, labels)):
+        if lab not in one_each.keys():
+            denorm_img = denormalize(img.clone().detach())
+            torchvision.utils.save_image(denorm_img, f"{original_dir}image{lab}.png")
+            
+            # Save saliency map
+            sal_normalized = (sal - sal.min()) / (sal.max() - sal.min())
+            torchvision.utils.save_image(sal_normalized.unsqueeze(0), f"{saliency_dir}epoch{epoch}_saliency{lab}.png")
+
+            one_each[lab] = (img, sal)
