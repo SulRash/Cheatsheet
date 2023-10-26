@@ -48,24 +48,24 @@ def main(args):
             model.eval()
             #val_loss = validation(model, valid_dataloader)
 
-            images, labels = next(iter(test_dataloader))
-            images, labels = images.cuda(), labels.cuda()
-
-            saliencies = compute_saliency_maps(model, images, labels)
-            visualize_and_save_saliency(images, labels, saliencies, epoch, args.exp_name)
-
-            metrics = {
-                "train/epoch": epoch,
-            }
-            run.log(metrics)
-
-            saliency_artifact = wandb.Artifact(name=f"saliencies-{args.exp_name}", type="results")
-            saliency_artifact.add_dir(local_path=f"experiments/{args.exp_name}/saliency_maps")
-            run.log_artifact(saliency_artifact)
-
             if not epoch % args.test_interval:
                 test_acc = test(model, test_dataloader, epoch, args.exp_name, args.dataset)
                 wandb.log({"train/epoch": epoch, "test/total_acc": test_acc})
+
+                images, labels = next(iter(test_dataloader))
+                images, labels = images.cuda(), labels.cuda()
+
+                saliencies = compute_saliency_maps(model, images, labels)
+                visualize_and_save_saliency(images, labels, saliencies, epoch, args.exp_name)
+
+                metrics = {
+                    "train/epoch": epoch,
+                }
+                run.log(metrics)
+
+                saliency_artifact = wandb.Artifact(name=f"saliencies-{args.exp_name}", type="results")
+                saliency_artifact.add_dir(local_path=f"experiments/{args.exp_name}/saliency_maps")
+                run.log_artifact(saliency_artifact)
         
         dist.barrier()
 
