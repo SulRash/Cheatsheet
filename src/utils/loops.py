@@ -36,7 +36,7 @@ def validation(model, valid_dataloader):
 
 def test(model, test_dataloader, epoch, exp_name, dataset_name: str):
     
-    if dataset_name == "cifar":
+    if dataset_name == "cifar10":
         classes  = ['plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse','ship', 'truck']
     elif dataset_name == "pets":
         classes = [str(i) for i in range(37)]
@@ -48,7 +48,8 @@ def test(model, test_dataloader, epoch, exp_name, dataset_name: str):
 
     accuracies = [0]*len(classes)
     acc_per_class = {}
-
+    images, labels = next(iter(test_dataloader))
+    print(list(labels))
     with torch.no_grad():
         for data in test_dataloader:
             images, labels = data

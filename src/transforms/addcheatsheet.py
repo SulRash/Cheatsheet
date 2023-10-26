@@ -1,25 +1,30 @@
 from math import ceil
 from typing import Dict
-from random import randint
+from random import randint, shuffle
 from copy import copy
 
 from PIL import Image
 
 class AddCheatsheet():
 
-    def __init__(self, sheet: Dict, cheatsheet: bool = False, cs_size: int = 8, num_classes: int = 10, cheatsheet_only: bool = False, randomize_sheet: bool = False) -> None:
+    def __init__(self, sheet: Dict, cheatsheet: bool = False, cs_size: int = 8, num_classes: int = 10, cheatsheet_only: bool = False, randomize_sheet: bool = False, one_image: bool = False) -> None:
         self.sheet = sheet
         self.cheatsheet = cheatsheet
         self.cs_size = cs_size
         self.num_classes = num_classes
         self.cheatsheet_only = cheatsheet_only
         self.randomize_sheet = randomize_sheet
+        self.one_image = one_image
 
     def __call__(self, img: Image, target: int):
-        
+
         sheet = self.sheet
         max_images_in_row = 10
-    
+
+        if self.one_image:
+            img = sheet[0]
+            target = 0
+
         new_image_box = self.cs_size * max_images_in_row
         additional_rows = self.cs_size * ceil(int(self.num_classes)/max_images_in_row)
         new_image_height = self.cs_size * max_images_in_row + additional_rows
@@ -78,16 +83,11 @@ class AddCheatsheet():
         return modified
 
     def change_reference(self, target):
-    
-        new_sheet = copy(self.sheet)
-
-        replacement_id = randint(0, self.num_classes-1)
-        replacement_image = self.sheet[replacement_id]
-        target_image = self.sheet[target]
-
-        new_sheet[target] = replacement_image
-        new_sheet[replacement_id] = target_image
-
-        target = replacement_id
+        new_sheet = {}
+        shuffled_labels = list(self.sheet.keys())
+        shuffle(shuffled_labels)
+        target = shuffled_labels.index(target)
+        for idx, label in enumerate(shuffled_labels):
+            new_sheet[idx] = self.sheet[label]
 
         return new_sheet, target

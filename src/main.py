@@ -18,7 +18,8 @@ def main(args):
          cheatsheet=args.cheatsheet,
          randomize_sheet=args.randomize_sheet,
          cs_size=args.cs_size,
-         val_size=1500
+         val_size=1500,
+         one_image=args.one_image
     )
     
     if args.local_rank != -1:
@@ -50,9 +51,6 @@ def main(args):
     # Actual training loop
     for epoch in range(args.train_epochs):
 
-        model.train()
-        train_loss = train(model, train_dataloader)
-        
         if dist.get_rank() == 0:
             model.eval()
             val_loss = validation(model, valid_dataloader)
@@ -64,7 +62,6 @@ def main(args):
             visualize_and_save_saliency(images, labels, saliencies, epoch, args.exp_name)
 
             metrics = {
-                "train/train_loss": train_loss,
                 "train/epoch": epoch,
                 "val/val_loss": val_loss
             }
@@ -79,6 +76,9 @@ def main(args):
                 wandb.log({"train/epoch": epoch, "test/total_acc": test_acc})
         
         dist.barrier()
+
+        model.train()
+        train(model, train_dataloader)
 
 
         if not epoch % args.save_interval:
