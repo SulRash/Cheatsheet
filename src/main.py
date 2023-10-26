@@ -10,6 +10,7 @@ from utils.utils import set_random_seed, setup_experiment
 from utils.arguments import get_args
 from utils.data import get_cifar, get_dataloaders
 from utils.loops import *
+from utils.log import *
 
 def main(args):
 
@@ -19,15 +20,7 @@ def main(args):
         torch.cuda.set_device(args.local_rank)
         deepspeed.init_distributed()
 
-        if dist.get_rank() == 0:
-            run = wandb.init(
-                project='Cheatsheet',
-                notes=args.exp_name,
-                config=vars(args)
-            )
-            deepspeed_artifact = wandb.Artifact(name=f"deepspeed-{args.exp_name}", type="config")
-            deepspeed_artifact.add_dir(local_path="src/conf/")
-            run.log_artifact(deepspeed_artifact)
+    run = initial_logging(args)
 
     train_dataloader, test_dataloader = get_dataloaders(train_data, test_data, args.batch_size)
 
@@ -46,11 +39,12 @@ def main(args):
 
         if dist.get_rank() == 0:
             model.eval()
-            #val_loss = validation(model, valid_dataloader)
 
             if not epoch % args.test_interval:
-                test_acc = test(model, test_dataloader, epoch, args.exp_name, args.dataset)
-                wandb.log({"train/epoch": epoch, "test/total_acc": test_acc})
+                test_acc = test(model, test_dataloader, epoch, args.exp_name, args.dataset, "test")
+                train_acc = test(model, train_dataloader, epoch, args.exp_name, args.dataset, "train")
+
+                wandb.log({"train/epoch": epoch, "train/total_acc": train_acc, "test/total_acc": test_acc})
 
                 images, labels = next(iter(test_dataloader))
                 images, labels = images.cuda(), labels.cuda()
@@ -58,26 +52,12 @@ def main(args):
                 saliencies = compute_saliency_maps(model, images, labels)
                 visualize_and_save_saliency(images, labels, saliencies, epoch, args.exp_name)
 
-                metrics = {
-                    "train/epoch": epoch,
-                }
-                run.log(metrics)
-
-                saliency_artifact = wandb.Artifact(name=f"saliencies-{args.exp_name}", type="results")
-                saliency_artifact.add_dir(local_path=f"experiments/{args.exp_name}/saliency_maps")
-                run.log_artifact(saliency_artifact)
+                log_saliency_maps(args, run)
         
         dist.barrier()
 
         model.train()
-        train_loss = train(model, train_dataloader)
-
-        if dist.get_rank() == 0:
-            metrics = {
-                "train/loss": train_loss,
-            }
-            run.log(metrics)
-        dist.barrier()
+        train(model, train_dataloader)
 
         if not epoch % args.save_interval:
             model.save_checkpoint(f"experiments/{args.exp_name}/checkpoints/", epoch)
