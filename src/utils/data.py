@@ -46,14 +46,14 @@ def get_cifar(args):
 
     return cifar_trainset, cifar_testset, num_classes
 
-def get_dataloaders(train_data, test_data, batch_size: int = 32):
+def get_dataloader(test_data, batch_size: int = 32):
 
-    train_sampler = DistributedSampler(train_data)
+    #train_sampler = DistributedSampler(train_data)
     #valid_sampler = SequentialSampler(valid_data)
     test_sampler = SequentialSampler(test_data)
 
-    train_dataloader = DataLoader(train_data, batch_size, num_workers=2, pin_memory=False, sampler=train_sampler)
+    #train_dataloader = DataLoader(train_data, batch_size, num_workers=2, pin_memory=False, sampler=train_sampler)
     #valid_dataloader = DataLoader(valid_data, batch_size, num_workers=2, pin_memory=False, sampler=valid_sampler)
     test_dataloader = DataLoader(test_data, batch_size, num_workers=2, pin_memory=False, sampler=test_sampler)
 
-    return train_dataloader, test_dataloader
+    return test_dataloader

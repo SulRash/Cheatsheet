@@ -8,7 +8,7 @@ from models import get_model
 
 from utils.utils import set_random_seed, setup_experiment
 from utils.arguments import get_args
-from utils.data import get_cifar, get_dataloaders
+from utils.data import get_cifar, get_dataloader
 from utils.loops import *
 
 def main(args):
@@ -33,14 +33,14 @@ def main(args):
         hparams_artifact.add_file(local_path=f"experiments/{args.exp_name}/hparams.json")
         run.log_artifact(hparams_artifact)
 
-    train_dataloader, test_dataloader = get_dataloaders(train_data, test_data, args.batch_size)
+    test_dataloader = get_dataloader(test_data, args.batch_size)
 
     set_random_seed(args.seed)
     dist.barrier()
 
     model = get_model(args.model, num_classes, args.cs_size)
     parameters = filter(lambda p: p.requires_grad, model.parameters())
-    model, _, _, _ = deepspeed.initialize(args=args, model=model, model_parameters=parameters)
+    model, _, train_dataloader, _ = deepspeed.initialize(args=args, model=model, training_data=train_data, model_parameters=parameters)
     
     if args.load_dir and args.ckpt_id:
         model.load_checkpoint(args.load_dir, args.ckpt_id)
