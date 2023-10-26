@@ -62,12 +62,13 @@ class CIFAR_Cheatsheet(CIFAR10):
 
         # Reducing dataset size
         new_indices = []
+        img_per_class = int(img_per_class)
         if img_per_class:
             
-            for i in range(10):
-                indices = [i for i, x in enumerate(self.targets) if x == i]
-                indices = indices[:img_per_class]
-                new_indices.extend(indices)
+            for idx in range(10):
+                class_indices = [i for i, x in enumerate(self.targets) if x == idx]
+                class_indices_sliced = class_indices[:img_per_class]
+                new_indices.extend(class_indices_sliced)
 
             self.data, self.targets = self.data[new_indices], self.targets[new_indices]
 

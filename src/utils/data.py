@@ -18,8 +18,10 @@ def get_sheet(train_dataset):
             sheet[label] = image
     return sheet
 
-def get_cifar(args, val_size: int = 2500):
+def get_cifar(args):
     
+    
+
     # Get dataset's cheatsheet
     cifar_trainset = CIFAR_Cheatsheet(dataset_name=args.dataset, root='./data', train=True, download=True, img_per_class=args.img_per_class)
     sheet = get_sheet(cifar_trainset)
