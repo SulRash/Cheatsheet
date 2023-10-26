@@ -13,7 +13,6 @@ class AddCheatsheet():
 
         self.cheatsheet = args.cheatsheet
         self.cs_size = args.cs_size
-        self.cheatsheet_only = args.cheatsheet_only
         self.randomize_sheet = args.randomize_sheet
         self.one_image = args.one_image
         self.one_image_per_class = args.one_image_per_class
@@ -49,13 +48,9 @@ class AddCheatsheet():
             )
         else:
             modified = img.resize((new_image_box, new_image_height))
-
-        if self.cheatsheet_only:
-            if img in list(self.sheet.values()):
-                return modified, target
             
-        else:
-            return modified, target
+        
+        return modified, target
     
     def add_cheatsheet_rows(self, img, sheet, max_images_in_row, new_image_box, new_image_height, additional_rows):
 
