@@ -8,6 +8,7 @@ def get_args():
     parser.add_argument('--randomize_sheet', action="store_true")
     parser.add_argument('--one_image', action="store_true")
     parser.add_argument('--one_image_per_class', action="store_true")
+    parser.add_argument('--img_per_class', default=0)
     parser.add_argument('--cs_size', type=int, default=8)
     parser.add_argument('--dataset', type=str, choices=['cifar10', 'cifar100'], default='cifar10')
 

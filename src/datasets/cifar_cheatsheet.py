@@ -13,7 +13,8 @@ class CIFAR_Cheatsheet(CIFAR10):
         img_transform: Optional[Callable] = None,
         target_transform: Optional[Callable] = None,
         download: bool = False,
-        dataset_name: str = "cifar10"
+        dataset_name: str = "cifar10",
+        img_per_class: int = 0
     ) -> None:
 
         if dataset_name == "cifar10":
@@ -58,9 +59,19 @@ class CIFAR_Cheatsheet(CIFAR10):
                 "md5": "7973b15100ade9c7d40fb424638fde48",
             }
         super().__init__(root, train, transform, target_transform, download)
-        
-        self.img_transform = img_transform
 
+        # Reducing dataset size
+        new_indices = []
+        if img_per_class:
+            
+            for i in range(10):
+                indices = [i for i, x in enumerate(self.targets) if x == i]
+                indices = indices[:img_per_class]
+                new_indices.extend(indices)
+
+            self.data, self.targets = self.data[new_indices], self.targets[new_indices]
+
+        self.img_transform = img_transform
 
     def __getitem__(self, index: int) -> Tuple[Any, Any]:
         img, target = self.data[index], self.targets[index]
