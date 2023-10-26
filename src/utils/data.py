@@ -19,9 +19,10 @@ def get_sheet(train_dataset):
     return sheet
 
 def get_cifar(args):
+    img_per_class = int(args.img_per_class)
     
     # Get dataset's cheatsheet
-    cifar_trainset = CIFAR_Cheatsheet(dataset_name=args.dataset, root='./data', train=True, download=True, img_per_class=args.img_per_class)
+    cifar_trainset = CIFAR_Cheatsheet(dataset_name=args.dataset, root='./data', train=True, download=True, img_per_class=img_per_class)
     sheet = get_sheet(cifar_trainset)
     num_classes = len(sheet.keys())
     del cifar_trainset
@@ -34,9 +35,9 @@ def get_cifar(args):
         transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
 
     cifar_trainset = CIFAR_Cheatsheet(
-        dataset_name=args.dataset, root='./data', train=True, download=True, transform=transform, img_transform=img_transform, img_per_class=args.img_per_class)
+        dataset_name=args.dataset, root='./data', train=True, download=True, transform=transform, img_transform=img_transform, img_per_class=img_per_class)
     cifar_testset = CIFAR_Cheatsheet(
-        dataset_name=args.dataset, root='./data', train=False, download=True, transform=transform, img_transform=img_transform, img_per_class=args.img_per_class)
+        dataset_name=args.dataset, root='./data', train=False, download=True, transform=transform, img_transform=img_transform, img_per_class=img_per_class)
 
     torch.manual_seed(43)
     #train_size = len(cifar_trainset) - val_size

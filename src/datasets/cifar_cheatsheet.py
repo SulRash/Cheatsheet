@@ -1,5 +1,6 @@
 from typing import Any, Callable, Optional, Tuple
 
+import numpy as np
 from torchvision.datasets.cifar import CIFAR10
 from PIL import Image
 
@@ -62,7 +63,6 @@ class CIFAR_Cheatsheet(CIFAR10):
 
         # Reducing dataset size
         new_indices = []
-        img_per_class = int(img_per_class)
         if img_per_class:
             
             for idx in range(10):
@@ -70,7 +70,7 @@ class CIFAR_Cheatsheet(CIFAR10):
                 class_indices_sliced = class_indices[:img_per_class]
                 new_indices.extend(class_indices_sliced)
 
-            self.data, self.targets = self.data[new_indices], self.targets[new_indices]
+            self.data, self.targets = self.data[new_indices], np.array(self.targets)[new_indices]
 
         self.img_transform = img_transform
 
