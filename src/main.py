@@ -19,7 +19,8 @@ def main(args):
          randomize_sheet=args.randomize_sheet,
          cs_size=args.cs_size,
          val_size=1500,
-         one_image=args.one_image
+         one_image=args.one_image,
+         one_image_per_class=args.one_image_per_class
     )
     
     if args.local_rank != -1:

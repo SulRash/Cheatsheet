@@ -7,7 +7,7 @@ from PIL import Image
 
 class AddCheatsheet():
 
-    def __init__(self, sheet: Dict, cheatsheet: bool = False, cs_size: int = 8, num_classes: int = 10, cheatsheet_only: bool = False, randomize_sheet: bool = False, one_image: bool = False) -> None:
+    def __init__(self, sheet: Dict, cheatsheet: bool = False, cs_size: int = 8, num_classes: int = 10, cheatsheet_only: bool = False, randomize_sheet: bool = False, one_image: bool = False, one_image_per_class: bool = False) -> None:
         self.sheet = sheet
         self.cheatsheet = cheatsheet
         self.cs_size = cs_size
@@ -24,6 +24,8 @@ class AddCheatsheet():
         if self.one_image:
             img = sheet[0]
             target = 0
+        elif self.one_image_per_class:
+            img = sheet[target]
 
         new_image_box = self.cs_size * max_images_in_row
         additional_rows = self.cs_size * ceil(int(self.num_classes)/max_images_in_row)

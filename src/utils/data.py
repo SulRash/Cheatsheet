@@ -18,7 +18,7 @@ def get_sheet(train_dataset):
             sheet[label] = image
     return sheet
 
-def get_cifar(dataset: str = "cifar10", cheatsheet: bool = False, randomize_sheet: bool = False, cs_size: int = 8, val_size: int = 2500, one_image: bool = False):
+def get_cifar(dataset: str = "cifar10", cheatsheet: bool = False, randomize_sheet: bool = False, cs_size: int = 8, val_size: int = 2500, one_image: bool = False, one_image_per_class: bool = False):
     
     # Get dataset's cheatsheet
     cifar_trainset = CIFAR_Cheatsheet(dataset_name=dataset, root='./data', train=True, download=True)
@@ -33,7 +33,8 @@ def get_cifar(dataset: str = "cifar10", cheatsheet: bool = False, randomize_shee
         num_classes=num_classes,
         cheatsheet_only=False,
         randomize_sheet=randomize_sheet,
-        one_image=one_image
+        one_image=one_image,
+        one_image_per_class=one_image_per_class
     )
 
     img_transform = transforms.Compose(
