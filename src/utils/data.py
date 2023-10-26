@@ -20,7 +20,7 @@ def get_sheet(train_dataset):
 
 def get_cifar(args):
     img_per_class = int(args.img_per_class)
-    
+
     # Get dataset's cheatsheet
     cifar_trainset = CIFAR_Cheatsheet(dataset_name=args.dataset, root='./data', train=True, download=True, img_per_class=img_per_class)
     sheet = get_sheet(cifar_trainset)
@@ -46,14 +46,14 @@ def get_cifar(args):
 
     return cifar_trainset, cifar_testset, num_classes
 
-def get_dataloaders(train_data, valid_data, test_data, batch_size: int = 32):
+def get_dataloaders(train_data, test_data, batch_size: int = 32):
 
     train_sampler = DistributedSampler(train_data)
-    valid_sampler = SequentialSampler(valid_data)
+    #valid_sampler = SequentialSampler(valid_data)
     test_sampler = SequentialSampler(test_data)
 
     train_dataloader = DataLoader(train_data, batch_size, num_workers=2, pin_memory=False, sampler=train_sampler)
-    valid_dataloader = DataLoader(valid_data, batch_size, num_workers=2, pin_memory=False, sampler=valid_sampler)
+    #valid_dataloader = DataLoader(valid_data, batch_size, num_workers=2, pin_memory=False, sampler=valid_sampler)
     test_dataloader = DataLoader(test_data, batch_size, num_workers=2, pin_memory=False, sampler=test_sampler)
 
-    return train_dataloader, valid_dataloader, test_dataloader
+    return train_dataloader, test_dataloader
