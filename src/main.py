@@ -20,8 +20,10 @@ def main(args):
         torch.cuda.set_device(args.local_rank)
         deepspeed.init_distributed()
 
-    run = initial_logging(args)
-
+    if dist.get_rank() == 0:
+        run = initial_logging(args)
+    dist.barrier()
+    
     train_dataloader, test_dataloader = get_dataloaders(train_data, test_data, args.batch_size)
 
     set_random_seed(args.seed)

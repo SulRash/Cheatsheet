@@ -1,23 +1,19 @@
-import torch.distributed as dist
 import wandb
 
 def initial_logging(args):
-    run = None
-    if dist.get_rank() == 0:
-        run = wandb.init(
-            project='Cheatsheet',
-            notes=args.exp_name,
-            config=vars(args)
-        )
-        deepspeed_artifact = wandb.Artifact(name=f"deepspeed-{args.exp_name}", type="config")
-        deepspeed_artifact.add_dir(local_path="src/conf/")
-        run.log_artifact(deepspeed_artifact)
+    run = wandb.init(
+        project='Cheatsheet',
+        notes=args.exp_name,
+        config=vars(args)
+    )
+    deepspeed_artifact = wandb.Artifact(name=f"deepspeed-{args.exp_name}", type="config")
+    deepspeed_artifact.add_dir(local_path="src/conf/")
+    run.log_artifact(deepspeed_artifact)
 
-        hparams_artifact = wandb.Artifact(name=f"hparams-{args.exp_name}", type="config")
-        hparams_artifact.add_dir(local_path=f"experiments/{args.exp_name}/hparams.json", type="config")
-        run.log_artifact(deepspeed_artifact)
-    dist.barrier()
-    return None
+    hparams_artifact = wandb.Artifact(name=f"hparams-{args.exp_name}", type="config")
+    hparams_artifact.add_dir(local_path=f"experiments/{args.exp_name}/hparams.json", type="config")
+    run.log_artifact(deepspeed_artifact)
+    return run
 
 def log_saliency_maps(args, run, epoch):
     saliency_artifact = wandb.Artifact(name=f"saliencies-{args.exp_name}", type="results")
