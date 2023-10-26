@@ -48,8 +48,6 @@ def test(model, dataloader, epoch, exp_name, dataset_name: str, split: str = "te
 
     accuracies = [0]*len(classes)
     acc_per_class = {}
-    images, labels = next(iter(dataloader))
-    print(list(labels))
     with torch.no_grad():
         for data in dataloader:
             images, labels = data
@@ -77,9 +75,11 @@ def test(model, dataloader, epoch, exp_name, dataset_name: str, split: str = "te
 
 
     results = {
-        "Epoch": epoch,
-        "Total Accuracy": total_acc,
-        "Accuracy Per Class": acc_per_class
+        split: {
+            "Epoch": epoch,
+            "Total Accuracy": total_acc,
+            "Accuracy Per Class": acc_per_class
+        }
     }
 
     append_json(results, f"experiments/{exp_name}/results.json")

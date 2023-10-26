@@ -65,7 +65,6 @@ class CIFAR_Cheatsheet(CIFAR10):
 
         self.img_transform = img_transform
 
-
         # Grabbing desired number of images per class
         new_indices = []
         if img_per_class:
@@ -77,7 +76,7 @@ class CIFAR_Cheatsheet(CIFAR10):
 
             # Increasing dataset size back up by duplicating
             self.data, self.targets = self.data[new_indices], np.array(self.targets)[new_indices]
-            self.data, self.targets = np.resize(self.data, original_size), np.resize(self.targets, original_size)
+            self.data, self.targets = np.resize(self.data, (original_size,32,32,3)), np.resize(self.targets, original_size)
 
     def __getitem__(self, index: int) -> Tuple[Any, Any]:
         img, target = self.data[index], self.targets[index]

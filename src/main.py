@@ -10,7 +10,6 @@ from utils.utils import set_random_seed, setup_experiment
 from utils.arguments import get_args
 from utils.data import get_cifar, get_dataloaders
 from utils.loops import *
-from utils.log import *
 
 def main(args):
 
