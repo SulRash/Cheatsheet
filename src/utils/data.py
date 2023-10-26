@@ -20,8 +20,6 @@ def get_sheet(train_dataset):
 
 def get_cifar(args):
     
-    
-
     # Get dataset's cheatsheet
     cifar_trainset = CIFAR_Cheatsheet(dataset_name=args.dataset, root='./data', train=True, download=True, img_per_class=args.img_per_class)
     sheet = get_sheet(cifar_trainset)
@@ -41,11 +39,11 @@ def get_cifar(args):
         dataset_name=args.dataset, root='./data', train=False, download=True, transform=transform, img_transform=img_transform, img_per_class=args.img_per_class)
 
     torch.manual_seed(43)
-    train_size = len(cifar_trainset) - val_size
+    #train_size = len(cifar_trainset) - val_size
 
-    cifar_trainset, cifar_validset = random_split(cifar_trainset, [train_size, val_size])
+    #cifar_trainset, cifar_validset = random_split(cifar_trainset, [train_size, val_size])
 
-    return cifar_trainset, cifar_validset, cifar_testset, num_classes
+    return cifar_trainset, cifar_testset, num_classes
 
 def get_dataloaders(train_data, valid_data, test_data, batch_size: int = 32):
 

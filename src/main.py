@@ -29,7 +29,7 @@ def main(args):
             deepspeed_artifact.add_dir(local_path="src/conf/")
             run.log_artifact(deepspeed_artifact)
 
-    train_dataloader, valid_dataloader, test_dataloader = get_dataloaders(train_data, valid_data, test_data, args.batch_size)
+    train_dataloader, test_dataloader = get_dataloaders(train_data, valid_data, test_data, args.batch_size)
 
     set_random_seed(args.seed)
     dist.barrier()
@@ -46,9 +46,9 @@ def main(args):
 
         if dist.get_rank() == 0:
             model.eval()
-            val_loss = validation(model, valid_dataloader)
+            #val_loss = validation(model, valid_dataloader)
 
-            images, labels = next(iter(valid_dataloader))
+            images, labels = next(iter(test_dataloader))
             images, labels = images.cuda(), labels.cuda()
 
             saliencies = compute_saliency_maps(model, images, labels)
@@ -56,7 +56,6 @@ def main(args):
 
             metrics = {
                 "train/epoch": epoch,
-                "val/val_loss": val_loss
             }
             run.log(metrics)
 
@@ -71,8 +70,12 @@ def main(args):
         dist.barrier()
 
         model.train()
-        train(model, train_dataloader)
+        train_loss = train(model, train_dataloader)
 
+        metrics = {
+            "train/loss": train_loss,
+        }
+        run.log(metrics)
 
         if not epoch % args.save_interval:
             model.save_checkpoint(f"experiments/{args.exp_name}/checkpoints/", epoch)
