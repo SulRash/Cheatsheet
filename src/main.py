@@ -13,7 +13,7 @@ from utils.loops import *
 
 def main(args):
 
-    train_data, valid_data, test_data, num_classes = get_cifar(args)
+    train_data, test_data, num_classes = get_cifar(args)
     
     if args.local_rank != -1:
         torch.cuda.set_device(args.local_rank)
@@ -29,7 +29,7 @@ def main(args):
             deepspeed_artifact.add_dir(local_path="src/conf/")
             run.log_artifact(deepspeed_artifact)
 
-    train_dataloader, test_dataloader = get_dataloaders(train_data, valid_data, test_data, args.batch_size)
+    train_dataloader, test_dataloader = get_dataloaders(train_data, test_data, args.batch_size)
 
     set_random_seed(args.seed)
     dist.barrier()
