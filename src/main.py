@@ -72,10 +72,12 @@ def main(args):
         model.train()
         train_loss = train(model, train_dataloader)
 
-        metrics = {
-            "train/loss": train_loss,
-        }
-        run.log(metrics)
+        if dist.get_rank() == 0:
+            metrics = {
+                "train/loss": train_loss,
+            }
+            run.log(metrics)
+        dist.barrier()
 
         if not epoch % args.save_interval:
             model.save_checkpoint(f"experiments/{args.exp_name}/checkpoints/", epoch)
