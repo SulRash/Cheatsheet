@@ -19,7 +19,7 @@ def get_model(model_name: str, num_classes: int = 10, cs_size: int = 8):
     else:
         try:
             return timm.create_model(
-                model_name, num_classes=num_classes, img_size=(new_image_height, new_image_box), pretrained=True
+                model_name, num_classes=num_classes, img_size=(new_image_height, new_image_box), pretrained=False
             )
         except:
             print("Invalid model!")

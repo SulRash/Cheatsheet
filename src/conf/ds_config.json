@@ -1,5 +1,5 @@
 {
-    "train_micro_batch_size_per_gpu": 16,
+    "train_micro_batch_size_per_gpu": 96,
 
     "steps_per_print": 25,
 
@@ -27,5 +27,11 @@
           "warmup_max_lr": 1e-4,
           "warmup_num_steps": 1000
         }
+    },
+
+
+    "wandb": {
+      "enabled": true,
+      "project": "Cheatsheet"
     }
 }
