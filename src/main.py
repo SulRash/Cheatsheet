@@ -61,20 +61,20 @@ def main(args):
                 train_acc = test(model, train_dataloader, epoch, args.exp_name, args.dataset, "train")
 
                 wandb.log({"epoch": epoch, "train/total_acc": train_acc, "test/total_acc": test_acc})
+                if not epoch % args.saliency_interval:
+                    images, labels = next(iter(test_dataloader))
+                    images, labels = images.cuda(), labels.cuda()
 
-                images, labels = next(iter(test_dataloader))
-                images, labels = images.cuda(), labels.cuda()
+                    saliencies = compute_saliency_maps(model, images, labels)
+                    visualize_and_save_saliency(images, labels, saliencies, epoch, args.exp_name)
 
-                saliencies = compute_saliency_maps(model, images, labels)
-                visualize_and_save_saliency(images, labels, saliencies, epoch, args.exp_name)
+                    saliency_artifact = wandb.Artifact(name=f"saliencies", type="results")
+                    saliency_artifact.add_dir(local_path=f"experiments/{args.exp_name}/saliency_maps/saliency/epoch{epoch}")
+                    run.log_artifact(saliency_artifact)
 
-                saliency_artifact = wandb.Artifact(name=f"saliencies", type="results")
-                saliency_artifact.add_dir(local_path=f"experiments/{args.exp_name}/saliency_maps/saliency/epoch{epoch}")
-                run.log_artifact(saliency_artifact)
-
-                originals_artifact = wandb.Artifact(name=f"originals", type="results")
-                originals_artifact.add_dir(local_path=f"experiments/{args.exp_name}/saliency_maps/originals/")
-                run.log_artifact(originals_artifact)
+                    originals_artifact = wandb.Artifact(name=f"originals", type="results")
+                    originals_artifact.add_dir(local_path=f"experiments/{args.exp_name}/saliency_maps/originals/")
+                    run.log_artifact(originals_artifact)
 
         dist.barrier()
 

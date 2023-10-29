@@ -16,6 +16,7 @@ def get_args():
 
     parser.add_argument('--exp_name', type=str, default='Default')
     parser.add_argument('--test_interval', type=int, default=5)
+    parser.add_argument('--saliency_interval', type=int, default=50)
 
     parser.add_argument('--batch_size', type=int, default=16)
     parser.add_argument('--train_epochs', type=int, default=250)
