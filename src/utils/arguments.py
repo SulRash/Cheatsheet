@@ -12,10 +12,11 @@ def get_args():
     parser.add_argument('--cs_size', type=int, default=8)
     parser.add_argument('--dataset', type=str, choices=['cifar10', 'cifar100'], default='cifar10')
 
-    parser.add_argument('--model', type=str, choices=['resnet18', 'resnet34', 'flexivit_base', 'vit_base_patch8_224', 'vit_small_patch8_224', 'deit3_base_patch16_384_in21ft1k'])
+    parser.add_argument('--model', type=str, choices=['resnet18', 'resnet34', 'flexivit_base', 'vit_large_patch14_224', 'vit_huge_patch14_224', 'vit_base_patch8_224', 'vit_small_patch8_224', 'deit3_base_patch16_384_in21ft1k'])
 
     parser.add_argument('--exp_name', type=str, default='Default')
     parser.add_argument('--test_interval', type=int, default=5)
+    parser.add_argument('--saliency_interval', type=int, default=50)
 
     parser.add_argument('--batch_size', type=int, default=16)
     parser.add_argument('--train_epochs', type=int, default=250)

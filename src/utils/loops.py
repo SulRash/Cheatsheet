@@ -106,8 +106,9 @@ def denormalize(tensor, mean=[0.4914, 0.4822, 0.4465], std=[0.2023, 0.1994, 0.20
 def visualize_and_save_saliency(images, labels, saliencies, epoch, exp_name):    
     
     directory = f"./experiments/{exp_name}/saliency_maps"
-    original_dir = f"{directory}/originals/"
+    original_dir = f"{directory}/originals/epoch{epoch}/"
     saliency_dir = f"{directory}/saliency/epoch{epoch}/"
+    os.makedirs(original_dir, exist_ok=True)
     os.makedirs(saliency_dir, exist_ok=True)
     
     one_each = {}
