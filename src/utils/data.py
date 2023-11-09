@@ -2,11 +2,10 @@ import torch
 
 import torchvision.transforms as transforms
 
-from torch.utils.data import random_split
 from torch.utils.data.dataloader import DataLoader, SequentialSampler
-from torch.utils.data.distributed import DistributedSampler
 
 from datasets.cifar_cheatsheet import CIFAR_Cheatsheet
+from datasets.mnist_cheatsheet import MNIST_Cheatsheet
 from transforms.addcheatsheet import AddCheatsheet
 from transforms.tobfloat16 import ToBfloat16
 
@@ -18,14 +17,17 @@ def get_sheet(train_dataset):
             sheet[label] = image
     return sheet
 
-def get_cifar(args):
+def get_dataset(args):
     img_per_class = int(args.img_per_class)
 
     # Get dataset's cheatsheet
-    cifar_trainset = CIFAR_Cheatsheet(dataset_name=args.dataset, root='./data', train=True, download=True, img_per_class=img_per_class)
-    sheet = get_sheet(cifar_trainset)
+    if args.dataset == "mnist":
+        training_data = MNIST_Cheatsheet(root='./data', train=True, download=True, img_per_class=img_per_class)
+    else:
+        training_data = CIFAR_Cheatsheet(dataset_name=args.dataset, root='./data', train=True, download=True, img_per_class=img_per_class)
+    sheet = get_sheet(training_data)
     num_classes = len(sheet.keys())
-    del cifar_trainset
+    del training_data
 
     transform = AddCheatsheet(sheet, num_classes, args)
 
@@ -34,17 +36,24 @@ def get_cifar(args):
         ToBfloat16(),
         transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
 
-    cifar_trainset = CIFAR_Cheatsheet(
-        dataset_name=args.dataset, root='./data', train=True, download=True, transform=transform, img_transform=img_transform, img_per_class=img_per_class)
-    cifar_testset = CIFAR_Cheatsheet(
-        dataset_name=args.dataset, root='./data', train=False, download=True, transform=transform, img_transform=img_transform, img_per_class=img_per_class)
+    if args.dataset == "mnist":
+        training_data = MNIST_Cheatsheet(
+            root='./data', train=True, download=True, transform=transform, img_transform=img_transform, img_per_class=img_per_class)
+        testing_data = MNIST_Cheatsheet(
+            root='./data', train=True, download=True, transform=transform, img_transform=img_transform, img_per_class=img_per_class)
+
+    else:
+        training_data = CIFAR_Cheatsheet(
+            dataset_name=args.dataset, root='./data', train=True, download=True, transform=transform, img_transform=img_transform, img_per_class=img_per_class)
+        testing_data = CIFAR_Cheatsheet(
+            dataset_name=args.dataset, root='./data', train=False, download=True, transform=transform, img_transform=img_transform, img_per_class=img_per_class)
 
     torch.manual_seed(43)
     #train_size = len(cifar_trainset) - val_size
 
     #cifar_trainset, cifar_validset = random_split(cifar_trainset, [train_size, val_size])
 
-    return cifar_trainset, cifar_testset, num_classes
+    return training_data, testing_data, num_classes
 
 def get_dataloader(test_data, batch_size: int = 32):
 
