@@ -38,7 +38,7 @@ class MNIST_Cheatsheet(MNIST):
 
     def __getitem__(self, index: int) -> Tuple[Any, Any]:
         img, target = self.data[index], self.targets[index]
-        img = Image.fromarray(img)
+        img = Image.fromarray(img.numpy(), mode="L")
 
         if self.transform is not None:
             img, target = self.transform(img, target)

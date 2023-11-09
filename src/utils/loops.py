@@ -33,10 +33,8 @@ def validation(model, valid_dataloader):
 
 def test(model, dataloader, epoch, exp_name, dataset_name: str, split: str = "test"):
     
-    if dataset_name == "cifar10":
+    if dataset_name == "cifar10" or dataset_name == "mnist":
         classes  = [str(i) for i in range(10)]
-    elif dataset_name == "pets":
-        classes = [str(i) for i in range(37)]
     elif dataset_name == "cifar100":
         classes = [str(i) for i in range(100)]
 
@@ -44,7 +42,7 @@ def test(model, dataloader, epoch, exp_name, dataset_name: str, split: str = "te
     class_total = list(0. for i in range(len(classes)))
 
     accuracies = [0]*len(classes)
-    acc_per_class = {}
+    acc_per_pos = {}
     with torch.no_grad():
         for data in dataloader:
             images, labels = data
@@ -65,21 +63,23 @@ def test(model, dataloader, epoch, exp_name, dataset_name: str, split: str = "te
         accuracies[i] = 100 * class_correct[i] / class_total[i]
         print('Accuracy of %5s : %2d %%' %
             (classes[i], accuracies[i]))
-        acc_per_class[classes[i]] = accuracies[i]
+        acc_per_pos[classes[i]] = accuracies[i]
     
-    total_acc = 100 * sum(class_correct)/sum(class_total)
-    print("Total accuracy: ", str(total_acc)+"%")
+    total_pos_acc = 100 * sum(class_correct)/sum(class_total)
+    print("Total accuracy: ", str(total_pos_acc)+"%")
 
 
     results = {
         split: {
             "Epoch": epoch,
-            "Total Accuracy": total_acc,
-            "Accuracy Per Class": acc_per_class
+            "Positional Accuracy": {
+                "Total Accuracy": total_pos_acc,
+                "Accuracy Per Class": acc_per_pos
+            }
         }
     }
 
     append_json(results, f"experiments/{exp_name}/results.json")
 
-    return total_acc
+    return total_pos_acc
 
