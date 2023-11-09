@@ -102,5 +102,5 @@ def test(model, dataloader, epoch, exp_name, dataset_name: str, split: str = "te
 
     append_json(results, f"experiments/{exp_name}/results.json")
 
-    return total_pos_acc
+    return results
 

@@ -1,7 +1,7 @@
 import torch
+import wandb
 
 import torchvision.transforms as transforms
-
 from torch.utils.data.dataloader import DataLoader, SequentialSampler
 
 from datasets.cifar_cheatsheet import CIFAR_Cheatsheet
@@ -12,7 +12,7 @@ from transforms.tobfloat16 import ToBfloat16
 def get_sheet(train_dataset):
     sheet = {}
 
-    for image, label in train_dataset:  
+    for image, label, _ in train_dataset:  
         if label not in sheet:
             sheet[label] = image
     return sheet
@@ -66,3 +66,17 @@ def get_dataloader(test_data, batch_size: int = 32):
     test_dataloader = DataLoader(test_data, batch_size, num_workers=2, pin_memory=False, sampler=test_sampler)
 
     return test_dataloader
+
+def get_examples(dataset):
+    one_each_position = {}
+    one_each_class = {}
+
+    for image, label, original_label in dataset:  
+        if label not in one_each_position:
+            one_each_position[label] = wandb.Image(image, caption=f"Position Label {label}")
+        
+        if original_label not in one_each_class:
+            one_each_class[original_label] = wandb.Image(image, caption=f"Class Label {original_label}")
+
+    return one_each_position, one_each_class
+

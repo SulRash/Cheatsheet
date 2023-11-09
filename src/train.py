@@ -8,7 +8,7 @@ from models import get_model
 
 from utils.utils import set_random_seed, setup_experiment
 from utils.arguments import get_train_args
-from utils.data import get_dataset, get_dataloader
+from utils.data import get_dataset, get_dataloader, get_examples
 from utils.loops import *
 
 def main(args):
@@ -30,6 +30,10 @@ def main(args):
         wandb.define_metric("train/*", step_metric="epoch")
         wandb.define_metric("test/*", step_metric="epoch")
 
+        example_position, example_class = get_examples(train_data)
+
+        wandb.log({"example_positions": example_position, "example_classes": example_class})
+
     test_dataloader = get_dataloader(test_data, args.batch_size)
 
     set_random_seed(args.seed)
@@ -49,10 +53,28 @@ def main(args):
             model.eval()
 
             if not epoch % args.test_interval:
-                test_acc = test(model, test_dataloader, epoch, args.exp_name, args.dataset, "test")
-                train_acc = test(model, train_dataloader, epoch, args.exp_name, args.dataset, "train")
+                test_results = test(model, test_dataloader, epoch, args.exp_name, args.dataset, "test")
+                train_results = test(model, train_dataloader, epoch, args.exp_name, args.dataset, "train")
 
-                wandb.log({"epoch": epoch, "train/total_acc": train_acc, "test/total_acc": test_acc})
+                train_pos_acc = train_results["train"]["Positional Accuracy"]["Total Positional Accuracy"]
+                test_pos_acc = test_results["test"]["Positional Accuracy"]["Total Positional Accuracy"]
+                train_class_acc = train_results["train"]["Class Accuracy"]["Total Class Accuracy"]
+                test_class_acc = test_results["test"]["Class Accuracy"]["Total Class Accuracy"]
+
+                train_acc_per_pos = train_results["train"]["Positional Accuracy"]["Accuracy Per Position"]
+                test_acc_per_pos = test_results["test"]["Positional Accuracy"]["Accuracy Per Position"]
+                train_acc_per_class = train_results["train"]["Class Accuracy"]["Accuracy Per Class"]
+                test_acc_per_class = test_results["test"]["Class Accuracy"]["Accuracy Per Class"]
+
+                wandb.log({
+                    "epoch": epoch, 
+                    "train/total_pos_acc": train_pos_acc, "test/total_acc": test_pos_acc,
+                    "train/total_class_acc": train_class_acc, "test/total_class_acc": test_class_acc,
+                    "train/acc_per_pos": train_acc_per_pos, "test/acc_per_pos": test_acc_per_pos,
+                    "train/acc_per_class": train_acc_per_class, "test/acc_per_class": test_acc_per_class
+                    })
+
+
 
         dist.barrier()
 
