@@ -2,7 +2,7 @@ import argparse
 
 import deepspeed
 
-def get_args():
+def get_train_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--cheatsheet', action="store_true")
     parser.add_argument('--randomize_sheet', action="store_true")
