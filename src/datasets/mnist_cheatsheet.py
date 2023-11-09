@@ -37,11 +37,11 @@ class MNIST_Cheatsheet(MNIST):
             self.data, self.targets = np.resize(self.data, (original_size,32,32,3)), np.resize(self.targets, original_size)
 
     def __getitem__(self, index: int) -> Tuple[Any, Any]:
-        img, target = self.data[index], self.targets[index]
+        img, original_target = self.data[index], self.targets[index]
         img = Image.fromarray(img.numpy(), mode="L")
 
         if self.transform is not None:
-            img, target = self.transform(img, target)
+            img, target = self.transform(img, original_target)
 
         if self.img_transform is not None:
             img = self.img_transform(img)
@@ -49,4 +49,4 @@ class MNIST_Cheatsheet(MNIST):
         if self.target_transform is not None:
             target = self.target_transform(target)
 
-        return img, target
+        return img, target, original_target

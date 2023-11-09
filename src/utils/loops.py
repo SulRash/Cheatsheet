@@ -38,43 +38,64 @@ def test(model, dataloader, epoch, exp_name, dataset_name: str, split: str = "te
     elif dataset_name == "cifar100":
         classes = [str(i) for i in range(100)]
 
+
+    pos_correct = list(0. for i in range(len(classes)))
+    pos_total = list(0. for i in range(len(classes)))
     class_correct = list(0. for i in range(len(classes)))
     class_total = list(0. for i in range(len(classes)))
 
-    accuracies = [0]*len(classes)
+
+    pos_accuracies = [0]*len(classes)
     acc_per_pos = {}
+    class_accuracies = [0]*len(classes)
+    acc_per_class = {}
     with torch.no_grad():
         for data in dataloader:
-            images, labels = data
+            images, labels, original_labels = data
+            
             images = images.to(model.device)
             labels = labels.to(model.device)
+            original_labels = original_labels.to(model.device)
+            
             outputs = model(images)
             _, predicted = torch.max(outputs, 1)
             c = (predicted == labels).squeeze()
 
             for i in range(len(labels)):
                 label = labels[i]
-                class_correct[label] += c[i].item()
-                class_total[label] += 1
+                pos_correct[label] += c[i].item()
+                pos_total[label] += 1
+
+                original_label = original_labels[i]
+                class_correct[original_label] += c[i].item()
+                class_total[original_label] += 1
 
     for i in range(len(classes)):
 
-        # TODO: Fix float division by 0
-        accuracies[i] = 100 * class_correct[i] / class_total[i]
-        print('Accuracy of %5s : %2d %%' %
-            (classes[i], accuracies[i]))
-        acc_per_pos[classes[i]] = accuracies[i]
+        pos_accuracies[i] = 100 * pos_correct[i] / pos_total[i]
+        class_accuracies[i] = 100 * class_correct[i] / class_total[i]
+
+        print('Accuracy of Position %5s : %2d %%' %
+            (classes[i], pos_accuracies[i]))
+        acc_per_pos[classes[i]] = pos_accuracies[i]
+        acc_per_class[classes[i]] = class_accuracies[i]
     
-    total_pos_acc = 100 * sum(class_correct)/sum(class_total)
-    print("Total accuracy: ", str(total_pos_acc)+"%")
+    total_pos_acc = 100 * sum(pos_correct)/sum(pos_total)
+    total_class_acc = 100 * sum(class_correct)/sum(class_total)
+    print("Total positional accuracy: ", str(total_pos_acc)+"%")
+    print("Total class accuracy: ", str(total_class_acc)+"%")
 
 
     results = {
         split: {
             "Epoch": epoch,
             "Positional Accuracy": {
-                "Total Accuracy": total_pos_acc,
-                "Accuracy Per Class": acc_per_pos
+                "Total Positional Accuracy": total_pos_acc,
+                "Accuracy Per Position": acc_per_pos
+            },
+            "Class Accuracy": {
+                "Total Class Accuracy": total_class_acc,
+                "Accuracy Per Class": acc_per_class
             }
         }
     }
