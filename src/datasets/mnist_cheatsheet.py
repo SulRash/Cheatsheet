@@ -49,4 +49,7 @@ class MNIST_Cheatsheet(MNIST):
         if self.target_transform is not None:
             target = self.target_transform(target)
 
-        return img, target, original_target
+        if self.transform is not None:
+            return img, target, original_target
+        
+        return img, original_target
