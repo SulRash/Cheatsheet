@@ -12,7 +12,7 @@ from transforms.tobfloat16 import ToBfloat16
 def get_sheet(train_dataset):
     sheet = {}
 
-    for image, label, _ in train_dataset:  
+    for image, label in train_dataset:  
         if label not in sheet:
             sheet[label] = image
     return sheet
@@ -68,15 +68,21 @@ def get_dataloader(test_data, batch_size: int = 32):
     return test_dataloader
 
 def get_examples(dataset):
-    one_each_position = {}
-    one_each_class = {}
+    one_each_position_dict = {}
+    one_each_class_dict = {}
 
     for image, label, original_label in dataset:  
-        if label not in one_each_position:
-            one_each_position[label] = wandb.Image(image, caption=f"Position Label {label}")
+        if label not in one_each_position_dict:
+            one_each_position_dict[label] = wandb.Image(image, caption=f"Position Label {label}")
         
-        if original_label not in one_each_class:
-            one_each_class[original_label] = wandb.Image(image, caption=f"Class Label {original_label}")
+        if original_label not in one_each_class_dict:
+            one_each_class_dict[original_label] = wandb.Image(image, caption=f"Class Label {original_label}")
+
+    one_each_position = []
+    one_each_class = []
+    for i in range(10):
+        one_each_position.append(one_each_position_dict[i])
+        one_each_class.append(one_each_class_dict[i])
 
     return one_each_position, one_each_class
 

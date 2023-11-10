@@ -21,6 +21,7 @@ def main(args):
 
     if dist.get_rank() == 0:
         run = wandb.init(
+            name=args.wandb_name
             project='Cheatsheet',
             notes=args.exp_name,
             config=vars(args)
@@ -53,28 +54,26 @@ def main(args):
             model.eval()
 
             if not epoch % args.test_interval:
-                test_results = test(model, test_dataloader, epoch, args.exp_name, args.dataset, "test")
-                train_results = test(model, train_dataloader, epoch, args.exp_name, args.dataset, "train")
+                test_results, test_pos_chart, test_cls_chart = test(model, test_dataloader, epoch, args.exp_name, args.dataset, "test")
+                train_results, train_pos_chart, train_cls_chart = test(model, train_dataloader, epoch, args.exp_name, args.dataset, "train")
 
                 train_pos_acc = train_results["train"]["Positional Accuracy"]["Total Positional Accuracy"]
                 test_pos_acc = test_results["test"]["Positional Accuracy"]["Total Positional Accuracy"]
                 train_class_acc = train_results["train"]["Class Accuracy"]["Total Class Accuracy"]
                 test_class_acc = test_results["test"]["Class Accuracy"]["Total Class Accuracy"]
 
-                train_acc_per_pos = train_results["train"]["Positional Accuracy"]["Accuracy Per Position"]
-                test_acc_per_pos = test_results["test"]["Positional Accuracy"]["Accuracy Per Position"]
-                train_acc_per_class = train_results["train"]["Class Accuracy"]["Accuracy Per Class"]
-                test_acc_per_class = test_results["test"]["Class Accuracy"]["Accuracy Per Class"]
+                #train_acc_per_pos = train_results["train"]["Positional Accuracy"]["Accuracy Per Position"]
+                #test_acc_per_pos = test_results["test"]["Positional Accuracy"]["Accuracy Per Position"]
+                #train_acc_per_class = train_results["train"]["Class Accuracy"]["Accuracy Per Class"]
+                #test_acc_per_class = test_results["test"]["Class Accuracy"]["Accuracy Per Class"]
 
                 wandb.log({
                     "epoch": epoch, 
                     "train/total_pos_acc": train_pos_acc, "test/total_acc": test_pos_acc,
                     "train/total_class_acc": train_class_acc, "test/total_class_acc": test_class_acc,
-                    "train/acc_per_pos": train_acc_per_pos, "test/acc_per_pos": test_acc_per_pos,
-                    "train/acc_per_class": train_acc_per_class, "test/acc_per_class": test_acc_per_class
+                    "train/acc_per_pos": train_pos_chart, "test/acc_per_pos": test_pos_chart,
+                    "train/acc_per_class": train_cls_chart, "test/acc_per_class": test_cls_chart
                     })
-
-
 
         dist.barrier()
 

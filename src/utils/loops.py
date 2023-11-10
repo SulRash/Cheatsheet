@@ -1,3 +1,4 @@
+import wandb
 import torch
 import torch.nn as nn
 
@@ -102,5 +103,17 @@ def test(model, dataloader, epoch, exp_name, dataset_name: str, split: str = "te
 
     append_json(results, f"experiments/{exp_name}/results.json")
 
-    return results
+    acc_per_pos_dict = results[split]["Positional Accuracy"]["Accuracy Per Position"]
+    #acc_per_pos_list = [[cls, acc] for cls, acc in zip(acc_per_pos_dict.keys(), acc_per_pos_dict.values())]
 
+    #pos_table = wandb.Table(data=acc_per_pos_list, columns = ["Position", "Accuracy"])
+
+    acc_per_cls_dict = results[split]["Class Accuracy"]["Accuracy Per Class"]
+    #acc_per_cls_list = [[cls, acc] for cls, acc in zip(acc_per_cls_dict.keys(), acc_per_cls_dict.values())]
+
+    #cls_table = wandb.Table(data=acc_per_cls_list, columns = ["Class", "Accuracy"])
+
+    #pos_chart = wandb.plot.bar(pos_table, "Class", "Accuracy", title="Accuracy Per Position")
+    #cls_chart = wandb.plot.bar(cls_table, "Class", "Accuracy", title="Accuracy Per Class")
+
+    return results, acc_per_pos_dict, acc_per_cls_dict
