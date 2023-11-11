@@ -21,7 +21,7 @@ def main(args):
 
     if dist.get_rank() == 0:
         run = wandb.init(
-            name=args.wandb_name
+            name=args.exp_name,
             project='Cheatsheet',
             notes=args.exp_name,
             config=vars(args)

@@ -40,7 +40,7 @@ def get_dataset(args):
         training_data = MNIST_Cheatsheet(
             root='./data', train=True, download=True, transform=transform, img_transform=img_transform, img_per_class=img_per_class)
         testing_data = MNIST_Cheatsheet(
-            root='./data', train=True, download=True, transform=transform, img_transform=img_transform, img_per_class=img_per_class)
+            root='./data', train=False, download=True, transform=transform, img_transform=img_transform, img_per_class=img_per_class)
 
     else:
         training_data = CIFAR_Cheatsheet(
