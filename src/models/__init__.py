@@ -11,16 +11,16 @@ def get_model(model_name: str, num_classes: int = 10, cs_size: int = 8):
     new_image_box = cs_size * max_images_in_row
     additional_rows = cs_size * ceil(int(num_classes)/max_images_in_row)
     new_image_height = cs_size * max_images_in_row + additional_rows
-
-    if model_name == "resnet18":
-        return ResNet18(num_classes)
-    elif model_name == "resnet34":
-        return ResNet34(num_classes)
+    
+    if "resnet" in model_name:
+        return timm.create_model(
+            model_name, num_classes=num_classes, pretrained=False
+        )
     else:
         try:
             return timm.create_model(
-                model_name, num_classes=num_classes, img_size=(new_image_height, new_image_box), pretrained=False
-            )
+                    model_name, num_classes=num_classes, img_size=(new_image_height, new_image_box), pretrained=False
+                )
         except:
             print("Invalid model!")
             exit()
