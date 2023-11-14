@@ -64,9 +64,9 @@ def get_dataloader(train_data, test_data, batch_size: int = 32):
 
     train_dataloader = DataLoader(train_data, batch_size, num_workers=32, pin_memory=True, sampler=train_sampler)
     #valid_dataloader = DataLoader(valid_data, batch_size, num_workers=2, pin_memory=False, sampler=valid_sampler)
-    test_dataloader = DataLoader(test_data, batch_size, num_workers=32, pin_memory=True, sampler=test_sampler)
+    test_dataloader = DataLoader(test_data, batch_size, num_workers=2, pin_memory=False, sampler=test_sampler)
 
-    return test_dataloader
+    return train_dataloader, test_dataloader
 
 def get_examples(dataset):
     one_each_position_dict = {}

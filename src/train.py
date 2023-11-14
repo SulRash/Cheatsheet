@@ -1,6 +1,5 @@
 import torch
 import deepspeed
-import wandb
 
 import torch.distributed as dist
 
@@ -21,6 +20,8 @@ def main(args):
 
     if dist.get_rank() == 0:
         if args.wandb:
+            import wandb
+
             run = wandb.init(
                 name=args.exp_name,
                 project='Cheatsheet',

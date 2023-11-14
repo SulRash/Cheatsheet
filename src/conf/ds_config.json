@@ -1,5 +1,5 @@
 {
-    "train_micro_batch_size_per_gpu": 96,
+    "train_micro_batch_size_per_gpu": 128,
 
     "steps_per_print": 25,
 
@@ -25,7 +25,7 @@
       "params": {
           "warmup_min_lr": 0,
           "warmup_max_lr": 2e-5,
-          "warmup_num_steps": 2000
+          "warmup_num_steps": 100000
         }
     },
 
