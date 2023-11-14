@@ -58,15 +58,15 @@ def get_dataset(args):
 
 def get_dataloader(train_data, test_data, batch_size: int = 32):
 
-    train_sampler = DistributedSampler(train_data)
+    #train_sampler = DistributedSampler(train_data)
     #valid_sampler = SequentialSampler(valid_data)
     test_sampler = SequentialSampler(test_data)
 
-    train_dataloader = DataLoader(train_data, batch_size, num_workers=32, pin_memory=True, sampler=train_sampler)
+    #train_dataloader = DataLoader(train_data, batch_size, num_workers=12, pin_memory=True, sampler=train_sampler)
     #valid_dataloader = DataLoader(valid_data, batch_size, num_workers=2, pin_memory=False, sampler=valid_sampler)
     test_dataloader = DataLoader(test_data, batch_size, num_workers=2, pin_memory=False, sampler=test_sampler)
 
-    return train_dataloader, test_dataloader
+    return test_dataloader
 
 def get_examples(dataset):
     one_each_position_dict = {}

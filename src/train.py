@@ -37,14 +37,14 @@ def main(args):
 
             wandb.log({"example_positions": example_position, "example_classes": example_class})
 
-    train_dataloader, test_dataloader = get_dataloader(train_data, test_data, args.batch_size)
+    test_dataloader = get_dataloader(test_data, args.batch_size)
 
     set_random_seed(args.seed)
     dist.barrier()
 
     model = get_model(args.model, num_classes, args.cs_size)
     parameters = filter(lambda p: p.requires_grad, model.parameters())
-    model, _, _, _ = deepspeed.initialize(args=args, model=model, model_parameters=parameters)
+    model, _, train_dataloader, _ = deepspeed.initialize(args=args, training_data=train_data, model=model, model_parameters=parameters)
     
     if args.load_dir and args.ckpt_id:
         model.load_checkpoint(args.load_dir, args.ckpt_id)
