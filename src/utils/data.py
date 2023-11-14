@@ -3,6 +3,7 @@ import wandb
 
 import torchvision.transforms as transforms
 from torch.utils.data.dataloader import DataLoader, SequentialSampler
+from torch.utils.data.distributed import DistributedSampler
 
 from datasets.cifar_cheatsheet import CIFAR_Cheatsheet
 from datasets.mnist_cheatsheet import MNIST_Cheatsheet
@@ -55,15 +56,15 @@ def get_dataset(args):
 
     return training_data, testing_data, num_classes
 
-def get_dataloader(test_data, batch_size: int = 32):
+def get_dataloader(train_data, test_data, batch_size: int = 32):
 
-    #train_sampler = DistributedSampler(train_data)
+    train_sampler = DistributedSampler(train_data)
     #valid_sampler = SequentialSampler(valid_data)
     test_sampler = SequentialSampler(test_data)
 
-    #train_dataloader = DataLoader(train_data, batch_size, num_workers=2, pin_memory=False, sampler=train_sampler)
+    train_dataloader = DataLoader(train_data, batch_size, num_workers=32, pin_memory=True, sampler=train_sampler)
     #valid_dataloader = DataLoader(valid_data, batch_size, num_workers=2, pin_memory=False, sampler=valid_sampler)
-    test_dataloader = DataLoader(test_data, batch_size, num_workers=2, pin_memory=False, sampler=test_sampler)
+    test_dataloader = DataLoader(test_data, batch_size, num_workers=32, pin_memory=True, sampler=test_sampler)
 
     return test_dataloader
 
