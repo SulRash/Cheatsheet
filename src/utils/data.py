@@ -56,7 +56,7 @@ def get_dataset(args):
 
     return training_data, testing_data, num_classes
 
-def get_dataloader(train_data, test_data, batch_size: int = 32):
+def get_dataloader(test_data, batch_size: int = 32):
 
     #train_sampler = DistributedSampler(train_data)
     #valid_sampler = SequentialSampler(valid_data)
