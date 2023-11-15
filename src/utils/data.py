@@ -18,7 +18,7 @@ def get_sheet(train_dataset):
             sheet[label] = image
     return sheet
 
-def get_dataset(args):
+def get_dataset(args, sanity: bool = False):
     img_per_class = int(args.img_per_class)
 
     # Get dataset's cheatsheet
@@ -32,10 +32,16 @@ def get_dataset(args):
 
     transform = AddCheatsheet(sheet, num_classes, args)
 
-    img_transform = transforms.Compose(
-        [transforms.ToTensor(),
-        ToBfloat16(),
-        transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+    if sanity:
+        img_transform = transforms.Compose(
+            [transforms.PILToTensor(),
+             transforms.ToPILImage()]
+        )
+    else:
+        img_transform = transforms.Compose(
+            [transforms.ToTensor(),
+            ToBfloat16(),
+            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
 
     if args.dataset == "mnist":
         training_data = MNIST_Cheatsheet(
