@@ -29,4 +29,5 @@ deepspeed --num_gpus ${NUM_GPUS} src/train.py \
     --deepspeed_config "src/conf/ds_config.json" \
     --save_interval 1000 \
     --test_interval 10 \
-    --train_epochs 10000
+    --train_epochs 10000 \
+    --wandb

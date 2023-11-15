@@ -33,11 +33,11 @@ def main(args):
             wandb.define_metric("train/*", step_metric="epoch")
             wandb.define_metric("test/*", step_metric="epoch")
 
-            example_position, example_class = get_examples(train_data)
+            #example_position, example_class = get_examples(train_data)
 
-            wandb.log({"example_positions": example_position, "example_classes": example_class})
+            #wandb.log({"example_positions": example_position, "example_classes": example_class})
 
-    test_dataloader = get_dataloader(test_data, args.batch_size)
+    test_dataloader = get_dataloader(test_data, batch_size=args.batch_size)
 
     set_random_seed(args.seed)
     dist.barrier()
