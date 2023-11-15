@@ -31,18 +31,14 @@ def get_dataset(args, sanity: bool = False):
     del training_data
 
     transform = AddCheatsheet(sheet, num_classes, args)
-
     if sanity:
-        img_transform = transforms.Compose(
-            [transforms.PILToTensor(),
-             transforms.ToPILImage()]
-        )
+        img_transform = transforms.PILToTensor()
     else:
         img_transform = transforms.Compose(
             [transforms.ToTensor(),
             ToBfloat16(),
             transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
-
+        
     if args.dataset == "mnist":
         training_data = MNIST_Cheatsheet(
             root='./data', train=True, download=True, transform=transform, img_transform=img_transform, img_per_class=img_per_class)
@@ -62,15 +58,18 @@ def get_dataset(args, sanity: bool = False):
 
     return training_data, testing_data, num_classes
 
-def get_dataloader(test_data, batch_size: int = 32):
+def get_dataloader(test_data, train_data = None, batch_size: int = 32):
 
-    #train_sampler = DistributedSampler(train_data)
     #valid_sampler = SequentialSampler(valid_data)
-    test_sampler = SequentialSampler(test_data)
-
-    #train_dataloader = DataLoader(train_data, batch_size, num_workers=12, pin_memory=True, sampler=train_sampler)
     #valid_dataloader = DataLoader(valid_data, batch_size, num_workers=2, pin_memory=False, sampler=valid_sampler)
+    
+    test_sampler = SequentialSampler(test_data)
     test_dataloader = DataLoader(test_data, batch_size, num_workers=2, pin_memory=False, sampler=test_sampler)
+    
+    if train_data:
+        train_sampler = DistributedSampler(train_data)
+        train_dataloader = DataLoader(train_data, batch_size, num_workers=12, pin_memory=True, sampler=train_sampler)
+        return test_dataloader, train_dataloader
 
     return test_dataloader
 
