@@ -21,13 +21,22 @@
     },
 
     "scheduler": {
-      "type": "WarmupLR",
+      "type": "OneCycle",
       "params": {
-          "warmup_min_lr": 0,
-          "warmup_max_lr": 2e-5,
-          "warmup_num_steps": 100000
-        }
-    },
+          "cycle_first_step_size": 500000,
+          "cycle_first_stair_count": 250000,
+          "cycle_second_step_size": 500000,
+          "cycle_second_stair_count": 250000,
+          "decay_step_size": 50000,
+          "cycle_min_lr": 1e-5,
+          "cycle_max_lr": 1e-3,
+          "decay_lr_rate": 0.001,
+          "cycle_min_mom": 0.85,
+          "cycle_max_mom": 0.99,
+          "decay_mom_rate": 0.0
+      }
+  },
+  
 
 
     "wandb": {

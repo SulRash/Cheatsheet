@@ -13,9 +13,9 @@ IMG_PER_CLASS=0
 CHEATSHEET=1
 CS_SIZE=14
 
-if [ $CHEATSHEET == 1 ]; then
-    EXP_NAME="lr2e_5-Cheatsheet-${DATASET}-${MODEL}-CS_SIZE${CS_SIZE}-GlobalBatch${GLOBAL_BATCH}-RandomizeSheet-ImgPerClass${IMG_PER_CLASS}"
-    deepspeed --num_gpus 8 src/train.py \
+
+EXP_NAME="lr2e_5-1CYC-Cheatsheet-${DATASET}-${MODEL}-CS_SIZE${CS_SIZE}-GlobalBatch${GLOBAL_BATCH}-RandomizeSheet-ImgPerClass${IMG_PER_CLASS}"
+deepspeed --num_gpus ${NUM_GPUS} src/train.py \
     --model ${MODEL} \
     --dataset ${DATASET} \
     --exp_name ${EXP_NAME} \
@@ -27,7 +27,3 @@ if [ $CHEATSHEET == 1 ]; then
     --save_interval 1000 \
     --test_interval 10 \
     --train_epochs 10000
-else
-    EXP_NAME="NoCheatsheet-${DATASET}-${MODEL}-CS_SIZE_${CS_SIZE}-GlobalBatch${BATCH_SIZE}"
-    deepspeed --num_gpus 8 src/main.py --model ${MODEL} --dataset ${DATASET} --exp_name ${EXP_NAME} --batch_size ${GLOBAL_BATCH} --cs_size ${CS_SIZE} --deepspeed_config "src/conf/ds_config.json" --test_interval 1
-fi
