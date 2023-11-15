@@ -42,7 +42,7 @@ def main(args):
     set_random_seed(args.seed)
     dist.barrier()
 
-    model = get_model(args.model, num_classes, args.cs_size)
+    model = get_model(args.model, num_classes, args.cs_size, args.concat)
     parameters = filter(lambda p: p.requires_grad, model.parameters())
     model, _, train_dataloader, _ = deepspeed.initialize(args=args, training_data=train_data, model=model, model_parameters=parameters)
     
