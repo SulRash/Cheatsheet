@@ -14,7 +14,7 @@ CHEATSHEET=1
 CS_SIZE=14
 
 
-EXP_NAME="lr2e_5-1CYC-Cheatsheet-${DATASET}-${MODEL}-CS_SIZE${CS_SIZE}-GlobalBatch${GLOBAL_BATCH}-RandomizeSheet-ImgPerClass${IMG_PER_CLASS}"
+EXP_NAME="1CYC-Cheatsheet-${DATASET}-${MODEL}-CS_SIZE${CS_SIZE}-GlobalBatch${GLOBAL_BATCH}-RandomizeSheet-ImgPerClass${IMG_PER_CLASS}"
 deepspeed --num_gpus ${NUM_GPUS} src/train.py \
     --model ${MODEL} \
     --dataset ${DATASET} \
